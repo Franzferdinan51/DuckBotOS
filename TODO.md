@@ -64,18 +64,18 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P5-1 | `docs/architecture.md` — full technical stack | 🔄 In Progress | Cron agent working on this |
-| P5-2 | `docs/installer.md` — Subiquity OEM design | 🔄 In Progress | Cron agent working on this |
-| P5-3 | `docs/providers.md` — LM Studio + all Hermes/OpenClaw providers | 🔄 In Progress | Cron agent working on this |
-| P5-4 | `docs/lm-studio.md` — headless install + API + OS integration | ⏳ Pending | |
-| P5-5 | `docs/browseros.md` — Linux install + default browser setup | ⏳ Pending | |
-| P5-6 | `docs/cx-linux-fork.md` — what we changed from cx-distro | ⏳ Pending | |
+| P5-1 | `docs/architecture.md` — full technical stack | ✅ Done | 740 lines, full technical stack documented |
+| P5-2 | `docs/installer.md` — Subiquity OEM design | ✅ Done | 510 lines, three ISOs, autoinstall.yaml, build checklist |
+| P5-3 | `docs/providers.md` — LM Studio + all Hermes/OpenClaw providers | ✅ Done | 477 lines, provider matrix, config, security, first-boot wizard |
+| P5-4 | `docs/lm-studio.md` — headless install + API + OS integration | ✅ Done | 8443 bytes, llmster install, systemd service, API endpoints, OS integration |
+| P5-5 | `docs/browseros.md` — Linux install + default browser setup | ✅ Done | 9265 bytes, .deb install, default browser setup, kiosk launcher, MCP |
+| P5-6 | `docs/cx-linux-fork.md` — what we changed from cx-distro | ✅ Done | 8671 bytes, fork process, file map, inheritance vs replacement |
 | P5-7 | `docs/features.md` | ✅ Done | 15 features, 3 tiers |
 | P5-8 | `SPEC.md` | ✅ Done | 15KB architecture |
 | P5-9 | `README.md` | ✅ Done | GitHub-ready landing page |
 | P5-10 | `OPEN-ISSUES.md` | ✅ Done | Decision tracker |
-| P5-11 | `docs/contributing.md` | ⏳ Pending | |
-| P5-12 | `docs/license.md` | ⏳ Pending | |
+| P5-11 | `docs/contributing.md` | ✅ Done | 10746 bytes — fork process, build cmds, package dev, git workflow, testing guide |
+| P5-12 | `docs/license.md` | ✅ Done | 11082 bytes — BSL 1.1 decision, upstream licenses, compatibility matrix, license files |
 
 ---
 
