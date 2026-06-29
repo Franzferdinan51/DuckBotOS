@@ -19,7 +19,7 @@ You boot your computer. The agent wakes up. Your entire desktop is a single chat
 - 🔒 Stop apps from leaking your data before it leaves
 - 🗣️ Listen and respond — voice-first when your hands are busy
 - 🤝 Coordinate with other agents when tasks get complex
-- 💾 Remember what you did yesterday, last week, last year
+- 💾 Remember what you did yesterday, last week, last year — **across every reboot**
 
 Not a chat sidebar. Not a "smart assistant" widget. **The whole OS.**
 
@@ -40,6 +40,40 @@ Pick at install time:
 | **Hermes-only** | Hermes Web Dashboard + `computer-use-linux` for desktop control |
 | **OpenClaw-only** | openclaw-os plugin + same computer-use-linux bridge |
 | **Both** | GDM session picker: Hermes / OpenClaw / Hybrid Workstation (GNOME + both) |
+
+---
+
+## 🧠 Memory & Brain — Ships by Default (NEW!)
+
+DuckBotOS comes with the [DuckBot RAG Memory System](https://github.com/Franzferdinan51/duckbot-rag-memory) **pre-installed in every mode** (Hermes, OpenClaw, Both). The agent never forgets.
+
+**What you get:**
+
+| Capability | Description |
+|------------|-------------|
+| 📦 **4-tier CoALA memory** | working → episodic → semantic → procedural (the canonical memory taxonomy from the CoALA paper) |
+| 🔍 **67 MCP tools** | `brain_wake_up`, `brain_recall`, `brain_remember`, `brain_palace`, `brain_skills_*`, `brain_nudge`, `brain_forget_by_query`, `brain_decay_*`, `brain_graph_*`, ... |
+| 🔁 **FSRS-6 spaced repetition** | Self-tuning forgetting curve — daily review queue (`brain_fsrs_review`) keeps important memories alive |
+| 🏛️ **Wing/Room/Drawer 2D palace** | MemPalace-inspired `brain_palace` MCP tool — navigate by project (wing) × time (room) × memory (drawer) |
+| 📑 **AAAK corpus index** | Scan the whole brain in <500 tokens via `brain_index` |
+| 🤝 **Multi-agent skill pipeline** | Agents stamp `skill_candidate` chunks → promote to agentskills.io `SKILL.md` for repeated use |
+| 🧬 **Honcho-style user model** | `brain_user_model` aggregates Duckets facts into a single memory block, updated daily |
+| ⏰ **autoWakeUp + autoSync hooks** | `brain_wake_up` fires on every `session_start`, `brain_sync` on every `session_end` |
+| 💾 **Local-first embeddings** | LM Studio at `127.0.0.1:1234` (GPU-accelerated, zero API cost) — OpenAI-compatible fallback |
+| 📂 **OpenClaw native plugin** | Auto-registered in `openclaw.json` — `duckbot-memory` plugin shim proxying 67 tools + session hooks |
+| 🔄 **Watcher daemon** | Polls the workspace every 5 min, content-hash dedup, auto-ingests new edits |
+
+**Installed at:** `/opt/duckbotos/brain/` (cloned from `Franzferdinan51/duckbot-rag-memory`)
+**Config:** `/etc/duckbotos/brain.env` (LM Studio pre-wired, OpenAI-compatible fallback)
+**MCP wrapper:** `/usr/bin/duckbotos-brain-mcp`
+**OpenClaw plugin:** `~/.openclaw/extensions/duckbot-memory/` (auto-registered in `openclaw.json`)
+**Package:** `duckbotos-brain` — installed in **all three install modes**
+
+The brain is wired into **every install mode** — Hermes, OpenClaw, and Both. It survives reboots, accumulates facts across sessions, and actively prevents the agent from forgetting important decisions (D1-D5 brain rules, the cloud-only directive, Duckets' preferences, project context).
+
+> **"Identity, not a feature."** — the brain is part of what makes DuckBotOS *DuckBotOS*. Without it, the agent is a chat sidebar. With it, the agent has continuity.
+
+Docs: [docs/lm-studio.md](docs/lm-studio.md) | Source: [duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory)
 
 ---
 
@@ -65,9 +99,9 @@ Full list: [docs/features.md](docs/features.md)
 |------|--------|
 | 📚 Docs (22 total) | ✅ Complete |
 | 📦 Packages (13/13 with debian/control + debian/rules + debian/changelog) | ✅ Complete |
-| 🔧 All service files (hermes, openclaw, lm-studio, computer-use, brain, kiosk) | ✅ Written |
+| 🧠 **DuckBot brain** (duckbot-rag-memory, 67 MCP tools, FSRS, skill pipeline) | ✅ **Ships by default in all modes** — wired via OpenClaw plugin |
+| 🔧 All service files (hermes, openclaw, lm-studio, computer-use, brain, kiosk, session-picker) | ✅ Written |
 | 🎨 Session picker UI for Both mode (8080) | ✅ Complete |
-| 🧠 DuckBot brain (67 MCP tools, FSRS, autoWakeUp + autoSync) | ✅ Ships by default in all modes |
 | 🏗️ ISO build pipeline (cx-distro fork, Ubuntu 24.04 Noble) | ✅ Ready — `./src/build.sh` |
 | 🤖 GitHub Actions CI auto-builds ISO | ✅ Configured |
 | 📋 HANDOFF.md for other agents | ✅ Complete |
@@ -83,6 +117,8 @@ The ISO build is the only remaining milestone. See [HANDOFF.md](HANDOFF.md) for 
 - **ISO builder:** Fork of `cxlinux-ai/cx-distro` (live-build + preseed + Debian packages)
 - **Compositor:** Weston kiosk + Chromium BrowserOS fullscreen
 - **Agents:** Hermes (NousResearch) + OpenClaw
+- **Memory & brain:** `duckbot-rag-memory` (4-tier CoALA, 67 MCP tools, FSRS, OpenClaw plugin shim)
+- **Local LLM:** LM Studio headless (llmster daemon) at `localhost:1234`
 - **Desktop control:** `agent-sh/computer-use-linux` Rust MCP server
 - **Voice:** openWakeWord + Whisper.cpp (LM Studio bundled) + Piper TTS
 - **Activity graph:** netdata + custom `hermesos-graph` daemon
@@ -96,6 +132,7 @@ We inherit from:
 - [cxlinux-ai/cx-core](https://github.com/cxlinux-ai/cx-core) — natural-language OS admin pattern
 - [thesysdev/openclaw-os](https://github.com/thesysdev/openclaw-os) — OpenClaw web workspace
 - [nousresearch/hermes-agent](https://github.com/nousresearch/hermes-agent) — agent core + Web Dashboard
+- [Franzferdinan51/duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory) — **the brain (ships by default in all DuckBotOS modes)**
 - [agent-sh/computer-use-linux](https://github.com/agent-sh/computer-use-linux) — desktop control MCP
 - [browseros-ai/BrowserOS](https://github.com/browseros-ai/BrowserOS) — default browser
 
@@ -103,8 +140,8 @@ We inherit from:
 
 ## License
 
-Apache 2.0 + attribution to NousResearch (Hermes), OpenClaw team, cxlinux-ai, agent-sh.
+Apache 2.0 + attribution to NousResearch (Hermes), OpenClaw team, cxlinux-ai, agent-sh, Franzferdinan51 (duckbot-rag-memory).
 
 ---
 
-*Built by [Franzferdinan51/DuckBotOS](https://github.com/Franzferdinan51/DuckBotOS). For when an OS should be an intelligent butler, not a chat sidebar.*
+*Built by [Franzferdinan51/DuckBotOS](https://github.com/Franzferdinan51/DuckBotOS). For when an OS should be an intelligent butler that remembers, not a chat sidebar that forgets.*
