@@ -1,0 +1,37 @@
+# Build artifacts
+*.iso
+*.qcow2
+*.vmdk
+build/
+debian/files
+debian/*.substvars
+debian/*.debhelper.log
+debian/*.debhelper.deps
+
+# Logs and temp
+*.log
+*.tmp
+.cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Internal agent files (don't commit secrets)
+/workspace-internal/
+*.env
+.env.local
+.envrc
+
+# CI/CD (when added)
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Rust
+target/
