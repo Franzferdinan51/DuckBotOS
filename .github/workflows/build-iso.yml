@@ -3,9 +3,13 @@ name: Build DuckBotOS ISO
 on:
   push:
     branches:
+      - main
       - duckbotos
     paths:
       - 'cx-distro/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - '.github/workflows/build-iso.yml'
   workflow_dispatch:
     inputs:
       mode:
@@ -29,18 +33,18 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - name: Checkout DuckBotOS (includes cx-distro subdirectory)
+      - name: Checkout DuckBotOS (this repo)
         uses: actions/checkout@v4
         with:
-          path: DuckBotOS
+          path: duckbot-os-repo
 
-      - name: Checkout cx-distro subdirectory
+      - name: Clone cx-distro build pipeline
         run: |
-          if [ ! -d "DuckBotOS/cx-distro" ]; then
-            echo "Error: cx-distro subdirectory not found"
-            exit 1
+          if [ -d "duckbot-os-repo/cx-distro" ]; then
+            echo "cx-distro already present as subdirectory"
           fi
-          echo "Found cx-distro with $(find DuckBotOS/cx-distro -name '*.sh' | wc -l) shell files"
+          git clone --depth=1 https://github.com/Franzferdinan51/cx-distro.git -b duckbotos duckbot-os-repo/cx-distro
+          echo "cx-distro cloned: $(ls duckbot-os-repo/cx-distro/packages/ | wc -l) packages"
 
       - name: Install build dependencies
         run: |
@@ -75,16 +79,12 @@ jobs:
         env:
           DUCKBOTOS_MODE: ${{ env.DUCKBOTOS_MODE }}
         run: |
-          cd DuckBotOS/cx-distro
+          cd duckbot-os-repo/cx-distro
           chmod +x src/build.sh
           chmod +x src/mods/install_all_mods.sh
           chmod +x scripts/*.sh
           chmod +x scripts/install-deps.sh
-
-          # Set DuckBotOS mode
           sed -i 's/^export DUCKBOTOS_MODE=.*/export DUCKBOTOS_MODE="${{ env.DUCKBOTOS_MODE }}"/' src/args.sh
-
-          # Run the build
           sudo ./src/build.sh
 
       - name: Locate built ISO
@@ -93,7 +93,6 @@ jobs:
           ISO_PATH=$(find . -name "*.iso" -type f 2>/dev/null | head -1)
           if [ -z "$ISO_PATH" ]; then
             echo "Error: No ISO found after build"
-            ls -la . 2>/dev/null || true
             find . -name "*.iso" 2>/dev/null || echo "no iso files found"
             exit 1
           fi
@@ -104,7 +103,7 @@ jobs:
 
       - name: Generate SHA256 checksum
         run: |
-          cd DuckBotOS
+          cd duckbot-os-repo
           ISO_FILE="${{ steps.locate.outputs.ISO_PATH }}"
           sha256sum "$ISO_FILE" > "${ISO_FILE}.sha256"
           echo "Checksum generated:"
@@ -113,11 +112,9 @@ jobs:
       - name: Generate SBOM
         if: runner.os == 'Linux'
         run: |
-          cd DuckBotOS
+          cd duckbot-os-repo
           ISO_FILE="${{ steps.locate.outputs.ISO_PATH }}"
           mkdir -p sbom
-
-          # Use syft to generate SBOM from the ISO
           if command -v syft &>/dev/null; then
             syft "$ISO_FILE" -o cyclonedx-json=sbom/duckbotos.cyclonedx.json || true
             syft "$ISO_FILE" -o spdx-json=sbom/duckbotos.spdx.json || true
@@ -131,22 +128,22 @@ jobs:
         with:
           name: duckbotos-${{ env.DUCKBOTOS_MODE }}-iso
           path: |
-            DuckBotOS/${{ steps.locate.outputs.ISO_PATH }}
-            DuckBotOS/${{ steps.locate.outputs.ISO_PATH }}.sha256
-            DuckBotOS/sbom/**
+            duckbot-os-repo/${{ steps.locate.outputs.ISO_PATH }}
+            duckbot-os-repo/${{ steps.locate.outputs.ISO_PATH }}.sha256
+            duckbot-os-repo/sbom/**
           retention-days: 30
           compression-level: 9
 
       - name: Create Release
-        if: github.ref == 'refs/heads/duckbotos' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           ISO_FILE: ${{ steps.locate.outputs.ISO_PATH }}
           ISO_SIZE: ${{ steps.locate.outputs.ISO_SIZE }}
         run: |
-          cd DuckBotOS
+          cd duckbot-os-repo
           gh release create "v${{ env.VERSION }}" \
             --title "DuckBotOS v${{ env.VERSION }} (${{ env.DUCKBOTOS_MODE }})" \
-            --notes "DuckBotOS ${{ env.DUCKBOTOS_MODE }} mode ISO. Built from cx-distro commit \`$(git rev-parse --short HEAD)\`." \
+            --notes "DuckBotOS ${{ env.DUCKBOTOS_MODE }} mode ISO. Built from cx-distro commit." \
             --latest \
             "$ISO_FILE" \
             "${ISO_FILE}.sha256" || true
@@ -156,10 +153,10 @@ jobs:
           echo "## DuckBotOS ISO Build Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Mode | ${{ env.DUCKBOTOS_MODE }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ISO | \`${{ steps.locate.outputs.ISO_PATH }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Size | ${{ steps.locate.outputs.ISO_SIZE }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`$(git -C DuckBotOS rev-parse --short HEAD)\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`main\` |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "ISO artifact available for 30 days." >> $GITHUB_STEP_SUMMARY
