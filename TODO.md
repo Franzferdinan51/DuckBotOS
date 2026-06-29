@@ -1,6 +1,6 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 05:50 EDT
+> Last updated: 2026-06-29 06:24 EDT
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -135,6 +135,7 @@
 |---|------|--------|-------|
 | P8-1 | `docs/build-guide.md` — Fork → VM → packages → ISO build | ✅ Done | 2026-06-29 04:59 — 17.7KB, full step-by-step from fork to ISO |
 | P8-2 | `docs/system-boot-flow.md` — Complete boot sequence | ✅ Done | 2026-06-29 04:35 — 8.7KB, service order, ports, failure handling |
+| P8-3 | `docs/phase10-readiness.md` — Docs→ISO bridge | ✅ Done | 2026-06-29 06:59 — 8.0KB, blockers + time estimates + parallel work |
 
 ## 🟢 PHASE 10 — Polish & Release
 
@@ -173,20 +174,20 @@
 
 ```
 1. ✅ Already done (repo pushed)
-2. ✅ P5-1 docs/architecture.md — COMPLETE
-3. ✅ P5-2 docs/installer.md — COMPLETE
-4. ✅ P5-3 docs/providers.md — COMPLETE
+2. ✅ P5-1 docs/architecture.md — COMPLETE (cross-refs added 06:24 EDT)
+3. ✅ P5-2 docs/installer.md — COMPLETE (cross-refs added 06:24 EDT)
+4. ✅ P5-3 docs/providers.md — COMPLETE (cross-refs added 06:24 EDT)
 5. ✅ P5-4 docs/lm-studio.md — COMPLETE (research confirmed: lms daemon up, server start, port 1234)
 6. ✅ P5-5 docs/browseros.md — COMPLETE (research confirmed: .deb at cdn.browseros.com, AppImage also available)
 7. ✅ P5-6 docs/cx-linux-fork.md — COMPLETE (CRITICAL FIX: cx-terminal NOT in cx-distro, lives in cx-core separate repo)
 8. ✅ P5-7 through P5-14 — ALL COMPLETE
-9. ✅ P6-1 docs/phase6-features.md — COMPLETE (new 2026-06-29 02:54)
-9. ⏳ P2-1 Set up Linux build VM (needs Duckets: which VM? UTM? Vagrant?)
-10. ⏳ P2-2 Fork cxlinux-ai/cx-distro on GitHub (needs Duckets approval + Linux VM)
-11. ⏳ P2-3 Replace cx-terminal in fork — N/A (cx-terminal not present in cx-distro)
-12. ⏳ P2-4 LM Studio .deb for Ubuntu
-13. ⏳ P2-5 BrowserOS .deb + default browser setup
-14. ⏳ P2-6 computer-use-linux package
+9. ✅ P6-1 docs/phase6-features.md — COMPLETE (2026-06-29 02:54)
+10. ⏳ P2-1 Set up Linux build VM (needs Duckets: which VM? UTM? Vagrant?)
+11. ⏳ P2-2 Fork cxlinux-ai/cx-distro on GitHub (needs Duckets approval + Linux VM)
+12. ⏳ P2-3 Replace cx-terminal in fork — N/A (cx-terminal not present in cx-distro)
+13. ⏳ P2-4 LM Studio .deb for Ubuntu
+14. ⏳ P2-5 BrowserOS .deb + default browser setup
+15. ⏳ P2-6 computer-use-linux package
 ```
 
 ## 🔬 Research Findings (2026-06-29 02:30 EDT)
@@ -282,6 +283,31 @@
 - All three docs are now research-verified from official sources (lmstudio.ai/docs, github.com/browseros-ai/BrowserOS, github.com/cxlinux-ai/cx-distro)
 
 **Still blocked:** D1-D5 (Duckets decisions needed), P2-1 (Linux VM setup needed)
+
+---
+
+### Research Cycle 2026-06-29 06:59 EDT (This Cycle)
+**Status review:** All docs from P5, P6, P7, P8 (P8-1, P8-2) marked ✅ Done and verified comprehensive on file inspection (architecture.md 757L, installer.md 523L, providers.md 490L, lm-studio.md 446L, browseros.md 497L, cx-linux-fork.md 352L). The cron prompt's work-to-do items 3-10 are already complete from prior cycles.
+
+**What was done this cycle:**
+- Verified all P5/P6/P7/P8 docs exist with substantial content (no skeleton stubs)
+- Wrote NEW `docs/phase10-readiness.md` (8012 bytes) — the bridge from "docs complete" → "first ISO boots": consolidates blockers B1 (Linux VM) + B2 (Duckets D1-D5), per-mutation time estimates (3.5 hrs total after unblock), parallel work that's possible without VM (first-boot-wizard, troubleshooting, security-model, roadmap docs), single best next step (Telegram ask for UTM + decisions)
+- Added P8-3 to TODO Phase 8 build docs table
+- 16 docs total now in repo (was 15)
+
+**Next cycle priorities (parallel-safe without VM):**
+- `docs/first-boot-wizard.md` (Step 1-5 UX design)
+- `docs/troubleshooting.md` (boot failures, recovery, log locations)
+- `docs/security-model.md` (TPM creds, AppArmor, firejail)
+- `docs/roadmap.md` (v0.1 → v1.0 timeline)
+- Continue `docs/dual-agent-ipc.md` — session-locking semantics
+- Sketch `packages/duckbotos-base/debian/control` (first real package file)
+
+**Still blocked:** B1 (Linux VM), D1-D5 (Duckets decisions)
+
+---
+
+*This file is the living todo for DuckBotOS. Updated after every significant work cycle.*
 
 
 ---
