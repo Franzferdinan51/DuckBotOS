@@ -55,30 +55,60 @@ duckbotos-computer-use.service          ← systemd service, runs as kiosk user
 ## Integration points — how agents talk to the desktop
 
 ### Hermes
-```
-~/.hermes/mcp.json:
-  {
-    "mcpServers": {
-      "newest-desktop-control": {
-        "command": "node",
-        "args": ["/opt/duckbotos/desktop-control/src/server.js"],
-        "env": {},
-        "transport": "stdio",
-        "startup_timeout_sec": 20,
-        "tool_timeout_sec": 60
-      },
-      "cua-driver": { ... }   // optional
-    }
-  }
+Config file: `~/hermes-config.json` (the only Hermes config file). 
+
+Format: `mcp_servers.{name}` where each value is a **JSON-STRINGIFIED** inner config object (NOT a nested object). Example from a real Hermes install:
+
+```json
+"mcp_servers": {
+  "newest-desktop-control": "{"command":"node","args":["/opt/duckbotos/desktop-control/src/server.js"],"env":{},"transport":"stdio","startup_timeout_sec":20,"tool_timeout_sec":60}",
+  "cua-driver": "...stringified..."  // optional
+}
 ```
 
 ### OpenClaw
-Uses **the exact same `mcpServers` format** at `~/.openclaw/mcp.json`. Hermes and OpenClaw share the same client-side MCP protocol — no separate registration code path needed.
+Config file: `~/.openclaw/openclaw.json` (default per `openclaw/src/config/paths.ts:resolveCanonicalConfigPath`).
 
-The single `duckbotos-computer-use.postinst` writes to **both** locations.
+Format: `mcp.servers.{name}` (nested under `mcp`, NOT top-level). Inner object is a NESTED object (NOT stringified). From `openclaw/src/config/schema.base.generated.ts`:
+
+```json
+"mcp": {
+  "servers": {
+    "newest-desktop-control": {
+      "command": "node",
+      "args": ["/opt/duckbotos/desktop-control/src/server.js"],
+      "env": {}
+    },
+    "cua-driver": { ... }  // optional
+    // strip transport + startup_timeout_sec + tool_timeout_sec (Claude Desktop fields, not OpenClaw schema)
+  }
+}
+```
+
+For OpenClaw EXTENSIONS (not MCP servers), use the separate `plugins.entries.{id}.enabled` + `config` block — also in `openclaw.json`.
+
+### Two different concepts in OpenClaw
+| Concept | Path | Format |
+|---------|------|--------|
+| MCP server process | `mcp.servers.{name}` | nested object |
+| Extension/plugin | `plugins.entries.{name}` | enabled + config |
+
+Brain plugin = extension (`plugins.entries.duckbot-memory`). Newest Desktop Control = MCP server (`mcp.servers.newest-desktop-control`).
 
 ### Configuration source of truth
-Duckets' own `setup-config.js` script (`node scripts/setup-config.js mcp-json`) generates the canonical config block. The postinst runs this script and uses its output verbatim — **no manual JSON formatting**, prevents drift.
+Duckets' own `setup-config.js` script (`node scripts/setup-config.js openclaw`) generates the canonical config block. The postinst runs this script and uses its output verbatim. SETUP_OUT drives both Hermes and OpenClaw registrations, but **the format is transformed** for each:
+- Hermes: JSON-stringify the inner object before writing to `mcp_servers.{name}`
+- OpenClaw: strip `transport`/`startup_timeout_sec`/`tool_timeout_sec` fields, write nested object to `mcp.servers.{name}`
+
+### Path summary (no longer use these wrong paths)
+| Wrong (was) | Correct |
+|-------------|---------|
+| `/var/lib/openclaw/workspace/openclaw.json` | `~/.openclaw/openclaw.json` |
+| `~/.openclaw/mcp.json` (separate file) | `mcp.servers` block in openclaw.json |
+| `~/.hermes/mcp-servers.json` | `~/hermes-config.json` |
+| `~/.hermes/mcp.json` | `~/hermes-config.json` |
+
+These wrong paths were a major bug class in v0.2.0 — fixed in v0.2.1.
 
 ---
 
