@@ -1,6 +1,6 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 04:59 EDT
+> Last updated: 2026-06-29 05:50 EDT
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -140,11 +140,11 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P7-1 | Plymouth boot theme (DuckBotOS branding) | ⏳ Pending | |
-| P7-2 | Wallpaper + icon assets | ⏳ Pending | |
-| P7-3 | GitHub Actions ISO build CI | ⏳ Pending | Reproducible `.iso` + `.sha256` + SBOM |
-| P7-4 | MkDocs documentation site | ⏳ Pending | |
-| P7-5 | v0.1.0 release — first bootable ISO | ⏳ Pending | |
+| P10-1 | Plymouth boot theme (DuckBotOS branding) | ⏳ Pending | |
+| P10-2 | Wallpaper + icon assets | ⏳ Pending | |
+| P10-3 | GitHub Actions ISO build CI | ⏳ Pending | Reproducible `.iso` + `.sha256` + SBOM |
+| P10-4 | MkDocs documentation site | ⏳ Pending | |
+| P10-5 | v0.1.0 release — first bootable ISO | ⏳ Pending | |
 
 ---
 
@@ -273,6 +273,15 @@
 
 ### Phase 2 Still Blocked
 **Phase 2 now the active blocker** — needs Linux VM + GitHub fork action from Duckets
+
+### Research Cycle 2026-06-29 05:50 EDT (This Cycle)
+**What was done:**
+- Significantly updated docs/lm-studio.md (358→712 lines, 8443→12551 bytes) — confirmed llmster/daemon architecture, CLI commands, JIT loading, systemd unit (correct binary path: `~/.lmstudio/bin/lms`), model identifiers
+- Significantly updated docs/browseros.md (377→487 lines, 9265→13825 bytes) — confirmed monorepo structure (browser/CLI/MCP), 13+ LLM providers, browseros-cli install, MCP server port 9003
+- Significantly updated docs/cx-linux-fork.md (319→527 lines, 8671→11953 bytes) — CORRECTED: `iso/live-build/` IS versioned in git; confirmed Makefile targets (`make iso`, `make deps`), output layout, distribution = Debian Trixie, live-build Ubuntu mode confirmed
+- All three docs are now research-verified from official sources (lmstudio.ai/docs, github.com/browseros-ai/BrowserOS, github.com/cxlinux-ai/cx-distro)
+
+**Still blocked:** D1-D5 (Duckets decisions needed), P2-1 (Linux VM setup needed)
 
 
 ---
