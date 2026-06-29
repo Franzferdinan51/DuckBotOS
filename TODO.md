@@ -1,6 +1,6 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 07:45 EDT
+> Last updated: 2026-06-29 14:05 EDT (post-handoff final cleanup)
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -170,24 +170,42 @@
 
 ---
 
-## 📋 Priority Order (what cron should tackle next)
+## 📋 Final Status (2026-06-29 14:05 EDT — Handoff Complete)
 
 ```
-1. ✅ Already done (repo pushed)
-2. ✅ P5-1 docs/architecture.md — COMPLETE (cross-refs added 06:24 EDT)
-3. ✅ P5-2 docs/installer.md — COMPLETE (cross-refs added 06:24 EDT)
-4. ✅ P5-3 docs/providers.md — COMPLETE (cross-refs added 06:24 EDT)
-5. ✅ P5-4 docs/lm-studio.md — COMPLETE (research confirmed: lms daemon up, server start, port 1234)
-6. ✅ P5-5 docs/browseros.md — COMPLETE (research confirmed: .deb at cdn.browseros.com, AppImage also available)
-7. ✅ P5-6 docs/cx-linux-fork.md — COMPLETE (CRITICAL FIX: cx-terminal NOT in cx-distro, lives in cx-core separate repo)
-8. ✅ P5-7 through P5-14 — ALL COMPLETE
-9. ✅ P6-1 docs/phase6-features.md — COMPLETE (2026-06-29 02:54)
-10. ⏳ P2-1 Set up Linux build VM (needs Duckets: which VM? UTM? Vagrant?)
-11. ⏳ P2-2 Fork cxlinux-ai/cx-distro on GitHub (needs Duckets approval + Linux VM)
-12. ⏳ P2-3 Replace cx-terminal in fork — N/A (cx-terminal not present in cx-distro)
-13. ⏳ P2-4 LM Studio .deb for Ubuntu
-14. ⏳ P2-5 BrowserOS .deb + default browser setup
-15. ⏳ P2-6 computer-use-linux package
+ALL PARALLEL-SAFE WORK DONE ✅
+
+Docs (22 total):
+  ✅ docs/architecture.md, installer.md, providers.md, lm-studio.md, browseros.md
+  ✅ docs/cx-linux-fork.md, build-guide.md, system-boot-flow.md
+  ✅ docs/features.md, first-boot-wizard.md, troubleshooting.md, security-model.md
+  ✅ docs/roadmap.md, debian-packaging.md, dual-agent-ipc.md
+  ✅ docs/computer-use.md, contributing.md, license.md, phase6-features.md
+  ✅ docs/phase7-implementation.md, phase10-readiness.md, testing.md, apparmor-profiles.md
+
+Packages (13 total — all have control + rules + changelog + postinst where needed):
+  ✅ duckbotos-base, duckbotos-meta (3 mode-specific variants)
+  ✅ duckbotos-hermes, duckbotos-openclaw (with brain plugin wiring)
+  ✅ duckbotos-lm-studio, duckbotos-browseros, duckbotos-computer-use
+  ✅ duckbotos-kiosk, duckbotos-kiosk-hermes
+  ✅ duckbotos-session-picker (Both-mode UI)
+  ✅ duckbotos-hybrid (Both-mode meta)
+  ✅ duckbotos-brain (NEW — duckbot-rag-memory ships by default in all modes)
+  ✅ duckbotos-branding (Plymouth + GDM + MOTD)
+
+Build pipeline (cx-distro fork, branch duckbotos):
+  ✅ Ubuntu 24.04 Noble base, DuckBotOS identity
+  ✅ 13 Debian packages installed based on DUCKBOTOS_MODE
+  ✅ All service files + postinst scripts
+  ✅ GitHub Actions CI auto-builds ISO on every push
+  ✅ HANDOFF.md written for the other agent
+
+Remaining (needs Linux VM — automated via CI):
+  ⏳ First ISO build (CI will surface errors, iterate from logs)
+  ⏳ LM Studio binary install (config-only for now — needs actual binary)
+  ⏳ BrowserOS binary install (default-only for now — needs actual binary)
+  ⏳ computer-use-linux binary (build from source or pre-built)
+  ⏳ Brain plugin ordering fix (workaround in HANDOFF.md)
 ```
 
 ## 🔬 Research Findings (2026-06-29 02:30 EDT)
