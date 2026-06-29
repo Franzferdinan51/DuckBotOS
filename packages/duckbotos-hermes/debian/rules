@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install Hermes service file
+	mkdir -p debian/duckbotos-hermes/lib/systemd/user
+	cp debian/hermes-gateway.service debian/duckbotos-hermes/lib/systemd/user/

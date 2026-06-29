@@ -1,0 +1,20 @@
+#!/bin/bash
+# postinst for duckbotos-kiosk-openclaw
+# Pre-configures the kiosk to load OpenClaw workspace
+
+set -e
+
+KIOSK_MODE_FILE="/etc/duckbotos/kiosk-mode"
+OPENCLAW_URL="http://localhost:18789/plugins/openclawos"
+
+case "$1" in
+    configure)
+        mkdir -p /etc/duckbotos
+        echo "$OPENCLAW_URL" > "$KIOSK_MODE_FILE"
+        echo "[duckbotos-kiosk-openclaw] Kiosk URL set to: $OPENCLAW_URL"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

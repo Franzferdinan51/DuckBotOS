@@ -1,0 +1,11 @@
+duckbotos-computer-use (0.2.0) stable; urgency=medium
+
+  * REWRITE (0.2.0) — replaced agent-sh/computer-use-linux with
+    Duckets' Newest Desktop Control (Lobster Edition)
+    https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill
+  * 38-test smoke suite
+  * Hermes + OpenClaw auto-wiring via JSON patches
+  * Pip deps: PyAutoGUI, Pillow, pygetwindow, pytesseract, screeninfo, psutil
+  * Optional trycua/cua bridge via duckbotos-cua-bridge
+
+ -- DuckBotOS Team <duckets@duckbotos.dev>  Mon, 29 Jun 2026 17:00:00 +0000

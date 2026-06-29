@@ -158,7 +158,7 @@ Reference: <https://github.com/trycua/cua>
 3. chroot /tmp/duckbotos-chroot /bin/bash
 4. apt install -y nodejs python3.12 python3-pip git ...
 5. install -d /opt/duckbotos/desktop-control
-   git clone https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill
+   git clone https://github.com/Franzferdinan51/clawdwatch-lobster-edition
 6. pip3 install -r /opt/duckbotos/desktop-control/requirements.txt
 7. bash /opt/duckbotos/desktop-control/scripts/install.sh --no-tests --no-config
 8. /usr/bin/node /opt/duckbotos/desktop-control/src/server.js (smoke test)

@@ -1,0 +1,28 @@
+#!/bin/bash
+# postrm for duckbotos-brain
+
+set -e
+
+case "$1" in
+    remove|purge)
+        SERVICE_USER=$(getent passwd | awk -F: '$3 >= 1000 && $3 < 65536 {print $1; exit}')
+
+        # Stop and disable the brain watcher service
+        if [ -n "$SERVICE_USER" ]; then
+            systemctl --user stop duckbotos-brain-watcher.service 2>/dev/null || true
+            systemctl --user disable duckbotos-brain-watcher.service 2>/dev/null || true
+            rm -f "/home/$SERVICE_USER/.config/systemd/user/duckbotos-brain-watcher.service" 2>/dev/null || true
+        fi
+
+        # Remove MCP wrapper and config
+        rm -f /usr/bin/duckbotos-brain-mcp
+        rm -f /etc/duckbotos/brain.env
+
+        echo "[duckbotos-brain] Brain uninstalled. Data at /opt/duckbotos/brain is preserved."
+        echo "   To also remove brain data: rm -rf /opt/duckbotos/brain"
+        ;;
+    upgrade|failed-upgrade|abort-install|abort-upgrade)
+        ;;
+    *)
+        ;;
+esac

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuckBotOS — Choose Your Experience</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e8e8f0;
+      --text-muted: #6b6b8a;
+      --accent: #7c3aed;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --hermes: #f97316;
+      --openclaw: #06b6d4;
+      --hybrid: #22c55e;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(249, 115, 22, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+      padding: 2rem;
+    }
+
+    .logo {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 1rem;
+    }
+
+    .card.hermes::before { background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), transparent); }
+    .card.openclaw::before { background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), transparent); }
+    .card.hybrid::before { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), transparent); }
+
+    .card:hover::before { opacity: 1; }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px var(--accent-glow);
+    }
+
+    .card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent), 0 8px 32px var(--accent-glow);
+    }
+
+    .card.selected::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .card.hermes .card-icon { color: var(--hermes); }
+    .card.openclaw .card-icon { color: var(--openclaw); }
+    .card.hybrid .card-icon { color: var(--hybrid); }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card.hermes h2 { color: var(--hermes); }
+    .card.openclaw h2 { color: var(--openclaw); }
+    .card.hybrid h2 { color: var(--hybrid); }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .card-features {
+      list-style: none;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-features li::before { content: '✓ '; color: var(--hybrid); }
+    .card-features li { margin-bottom: 0.25rem; }
+
+    .card-agent {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-agent code {
+      background: var(--bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .selected-label {
+      font-size: 0.9rem;
+    }
+
+    .selected-label strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .launch-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .launch-btn:hover {
+      background: #6d28d9;
+      transform: scale(1.02);
+    }
+
+    .launch-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Keyboard hint */
+    .keyboard-hint {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    kbd {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+      padding: 0.15rem 0.5rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+
+    /* Loading overlay */
+    .loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 15, 0.9);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading.visible { display: flex; }
+
+    .loading-spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p { color: var(--text-muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🦆</div>
+    <h1>DuckBotOS</h1>
+    <p class="subtitle">Choose your agent experience</p>
+
+    <div class="cards">
+      <!-- Hermes -->
+      <div class="card hermes" onclick="select('hermes')" id="card-hermes">
+        <span class="card-icon">⚡</span>
+        <h2>Hermes</h2>
+        <p>NousResearch's agent — chat-first, skills system, voice, messaging, sub-agents.</p>
+        <ul class="card-features">
+          <li>Web Dashboard at :9119</li>
+          <li>Skills &amp; memory</li>
+          <li>Voice interaction</li>
+          <li>iMessage &amp; WhatsApp</li>
+          <li>Async sub-agents</li>
+        </ul>
+        <div class="card-agent">Agent: <code>Hermes v0.17</code></div>
+      </div>
+
+      <!-- OpenClaw -->
+      <div class="card openclaw" onclick="select('openclaw')" id="card-openclaw">
+        <span class="card-icon">🦅</span>
+        <h2>OpenClaw</h2>
+        <p>OpenClaw gateway — multi-channel, web workspace, 40+ tools, hybrid orchestrator.</p>
+        <ul class="card-features">
+          <li>Workspace at :18789</li>
+          <li>Telegram, Signal, Discord</li>
+          <li>40+ built-in tools</li>
+          <li>Sub-conscious daemon</li>
+          <li>Agent mesh networking</li>
+        </ul>
+        <div class="card-agent">Agent: <code>OpenClaw</code></div>
+      </div>
+
+      <!-- Hybrid -->
+      <div class="card hybrid" onclick="select('hybrid')" id="card-hybrid">
+        <span class="card-icon">🔗</span>
+        <h2>Hybrid</h2>
+        <p>Both agents running. Full GNOME desktop with DuckBotOS panels in the taskbar.</p>
+        <ul class="card-features">
+          <li>Both agents active</li>
+          <li>GNOME desktop session</li>
+          <li>Agent bus IPC</li>
+          <li>Shared computer-use</li>
+          <li>Pick agent per task</li>
+        </ul>
+        <div class="card-agent">Agents: <code>Hermes + OpenClaw</code></div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <span class="selected-label" id="selected-label">Select an experience above</span>
+      <button class="launch-btn" id="launch-btn" onclick="launch()" disabled>Launch →</button>
+    </div>
+
+    <p class="keyboard-hint">
+      Or press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to select, <kbd>Enter</kbd> to launch
+    </p>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p id="loading-text">Starting Hermes...</p>
+  </div>
+
+  <script>
+    let selected = null;
+
+    const modes = {
+      hermes:   { label: 'Hermes',   url: 'http://localhost:9119',              file: '/etc/duckbotos/kiosk-mode' },
+      openclaw: { label: 'OpenClaw',  url: 'http://localhost:18789/plugins/openclawos', file: '/etc/duckbotos/kiosk-mode' },
+      hybrid:   { label: 'Hybrid',    url: 'http://localhost:8081',              file: '/etc/duckbotos/kiosk-mode' }
+    };
+
+    function select(mode) {
+      selected = mode;
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('card-' + mode).classList.add('selected');
+      document.getElementById('selected-label').innerHTML =
+        `Selected: <strong>${modes[mode].label}</strong>`;
+      document.getElementById('launch-btn').disabled = false;
+    }
+
+    async function launch() {
+      if (!selected) return;
+      const m = modes[selected];
+      const btn = document.getElementById('launch-btn');
+      const loading = document.getElementById('loading');
+      const loadingText = document.getElementById('loading-text');
+
+      btn.disabled = true;
+      loading.classList.add('visible');
+      loadingText.textContent = `Starting ${m.label}...`;
+
+      try {
+        // Write the kiosk mode symlink (requires root)
+        // The kiosk service reads this to know which URL to load
+        const response = await fetch('/api/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: selected, url: m.url })
+        });
+
+        if (!response.ok) throw new Error('Session API error');
+
+        // Wait a moment for services to start
+        await new Promise(r => setTimeout(r, 2000));
+
+        // Navigate to the agent URL
+        window.location.href = m.url;
+      } catch (err) {
+        loading.classList.remove('visible');
+        btn.disabled = false;
+        alert('Failed to start ' + m.label + ': ' + err.message);
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '1') select('hermes');
+      if (e.key === '2') select('openclaw');
+      if (e.key === '3') select('hybrid');
+      if (e.key === 'Enter' && selected) launch();
+    });
+
+    // Auto-select Hermes after 3s (UX convenience)
+    setTimeout(() => {
+      if (!selected) select('hermes');
+    }, 3000);
+  </script>
+</body>
+</html>

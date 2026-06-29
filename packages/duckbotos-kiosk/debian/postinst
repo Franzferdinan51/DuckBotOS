@@ -1,0 +1,33 @@
+#!/bin/bash
+# postinst for duckbotos-kiosk
+# Enables the Weston+Chromium kiosk service and seeds the default kiosk URL.
+# The URL is overridden by duckbotos-kiosk-hermes, duckbotos-kiosk-openclaw,
+# or duckbotos-session-picker at runtime.
+
+set -e
+
+KIOSK_MODE_FILE="/etc/duckbotos/kiosk-mode"
+DEFAULT_URL="http://localhost:9119"
+
+case "$1" in
+    configure)
+        mkdir -p /etc/duckbotos
+        # Seed default URL ONLY if no mode package has written one yet
+        if [ ! -f "$KIOSK_MODE_FILE" ] && [ ! -L "$KIOSK_MODE_FILE" ]; then
+            echo "$DEFAULT_URL" > "$KIOSK_MODE_FILE"
+            echo "[duckbotos-kiosk] Seeded default kiosk URL: $DEFAULT_URL"
+        else
+            echo "[duckbotos-kiosk] Kiosk mode file already set, leaving alone"
+        fi
+
+        # Enable the kiosk service (don't start it — wait for graphical.target)
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload 2>/dev/null || true
+            systemctl enable duckbotos-kiosk.service 2>/dev/null || true
+        fi
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

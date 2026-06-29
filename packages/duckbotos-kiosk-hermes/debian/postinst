@@ -1,0 +1,20 @@
+#!/bin/bash
+# postinst for duckbotos-kiosk-hermes
+# Pre-configures the kiosk to load Hermes dashboard
+
+set -e
+
+KIOSK_MODE_FILE="/etc/duckbotos/kiosk-mode"
+HERMES_URL="http://localhost:9119"
+
+case "$1" in
+    configure)
+        mkdir -p /etc/duckbotos
+        echo "$HERMES_URL" > "$KIOSK_MODE_FILE"
+        echo "[duckbotos-kiosk-hermes] Kiosk URL set to: $HERMES_URL"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

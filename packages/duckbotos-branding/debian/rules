@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install DuckBotOS branding assets into the package staging dir
+	mkdir -p debian/duckbotos-branding/etc/duckbotos
+	mkdir -p debian/duckbotos-branding/etc/profile.d
+	mkdir -p debian/duckbotos-branding/etc/motd
+	mkdir -p debian/duckbotos-branding/usr/share/plymouth/themes/duckbotos
+
+	# Branding config (shell prompt, default browser, etc.)
+	install -m 644 debian/source/etc/duckbotos/branding \
+		debian/duckbotos-branding/etc/duckbotos/branding
+
+	# Profile.d loader
+	install -m 755 debian/source/etc/profile.d/duckbotos-branding.sh \
+		debian/duckbotos-branding/etc/profile.d/duckbotos-branding.sh
+
+	# MOTD (Message of the Day)
+	install -m 644 debian/source/etc/motd/duckbotos \
+		debian/duckbotos-branding/etc/motd/duckbotos
+
+	# Plymouth boot splash theme
+	install -m 644 debian/source/usr/share/plymouth/themes/duckbotos/duckbotos.plymouth \
+		debian/duckbotos-branding/usr/share/plymouth/themes/duckbotos/duckbotos.plymouth
+	install -m 644 debian/source/usr/share/plymouth/themes/duckbotos/duckbotos.script \
+		debian/duckbotos-branding/usr/share/plymouth/themes/duckbotos/duckbotos.script
+	install -m 644 debian/source/usr/share/plymouth/themes/duckbotos/duckbotos-logo.png \
+		debian/duckbotos-branding/usr/share/plymouth/themes/duckbotos/duckbotos-logo.png
+
+override_dh_installinit:
+	# No init scripts in this package

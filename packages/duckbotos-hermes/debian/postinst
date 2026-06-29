@@ -1,0 +1,131 @@
+#!/bin/bash
+# postinst for duckbotos-hermes
+# Installs Hermes (NousResearch) agent from source
+
+set -e
+
+HERMES_HOME="${HOME}/.hermes"
+HERMES_SERVICE_DIR="${HOME}/.config/systemd/user"
+HERMES_SERVICE="${HERMES_SERVICE_DIR}/hermes-gateway.service"
+DUCKBOTOS_MODES_DIR="/etc/duckbotos"
+SYSTEMD_SYSTEM_DIR="/lib/systemd/system"
+
+# Resolve real user home (works in both postinst and live environment)
+REAL_HOME=$(getent passwd | awk -F: '$3 >= 1000 {print $6; exit}')
+
+install_hermes() {
+    local home="${1:-$REAL_HOME}"
+    local hermes_dir="$home/.local/share/hermes"
+
+    echo "[duckbotos-hermes] Installing Hermes agent..."
+
+    # Create hermes directories
+    mkdir -p "$home/.hermes"
+    mkdir -p "$home/.local/bin"
+    mkdir -p "$home/.local/share/hermes"
+    mkdir -p "$home/.config/systemd/user"
+
+    # Clone Hermes from GitHub if not present
+    if [ ! -d "$hermes_dir/.git" ]; then
+        echo "[duckbotos-hermes] Cloning Hermes from nousresearch/hermes-agent..."
+        rm -rf "$hermes_dir"
+        git clone --depth=1 --branch main \
+            https://github.com/nousresearch/hermes-agent \
+            "$hermes_dir"
+    fi
+
+    # Install Hermes Python package
+    echo "[duckbotos-hermes] Installing Hermes Python package..."
+    cd "$hermes_dir"
+    pip3 install -e . --quiet 2>&1 | tail -5 || true
+
+    # Install Hermes CLI wrapper
+    cat > "$home/.local/bin/hermes" << 'HERMES_WRAPPER'
+#!/bin/bash
+# Hermes CLI wrapper for DuckBotOS
+export HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+export HERMES_URL="${HERMES_URL:-http://localhost:9110}"
+export PYTHONUNBUFFERED=1
+
+if [ -f "$HOME/.local/share/hermes/hermes_agent/__init__.py" ]; then
+    cd "$HOME/.local/share/hermes"
+    exec python3 -m hermes_agent.cli "$@"
+else
+    echo "Hermes not installed. Run: pip install hermes-agent"
+    exit 1
+fi
+HERMES_WRAPPER
+    chmod +x "$home/.local/bin/hermes"
+
+    # Install systemd user service
+    cat > "$home/.config/systemd/user/hermes-gateway.service" << SERVICE_EOF
+[Unit]
+Description=Hermes Agent Gateway
+After=network-online.target lm-studio-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=\${HOME}
+Environment=HERMES_HOME=\${HOME}/.hermes
+Environment=HERMES_URL=http://localhost:9110
+ExecStart=\${HOME}/.local/bin/hermes gateway start --port 9110 --dashboard-port 9119
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=\${HOME}/.hermes \${HOME}/.local/share/hermes
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
+SERVICE_EOF
+
+    # Enable lingering so service starts at boot without login
+    if command -v loginctl >/dev/null 2>&1 && [ -n "$(who | grep -v '^root ' | head -1)" ]; then
+        local user=$(who | grep -v '^root ' | head -1 | awk '{print $1}')
+        loginctl enable-linger "$user" 2>/dev/null || true
+    fi
+
+    # Reload systemd, enable and start the service
+    if command -v systemctl >/dev/null 2>&1; then
+        systemctl --user daemon-reload 2>/dev/null || true
+        systemctl --user enable hermes-gateway.service 2>/dev/null || true
+        systemctl --user start hermes-gateway.service 2>/dev/null || true
+    fi
+
+    echo "[duckbotos-hermes] Hermes installed."
+    echo "   Dashboard: http://localhost:9119"
+    echo "   Gateway:   http://localhost:9110"
+    echo "   CLI:       hermes gateway start"
+}
+
+configure_kiosk_mode() {
+    # Configure the kiosk to load Hermes by default
+    mkdir -p "$DUCKBOTOS_MODES_DIR"
+    echo "http://localhost:9119" > "$DUCKBOTOS_MODES_DIR/kiosk-mode"
+    echo "[duckbotos-hermes] Kiosk mode set to Hermes dashboard."
+}
+
+case "$1" in
+    configure)
+        install_hermes
+        configure_kiosk_mode
+
+        echo ""
+        echo "✅ Hermes agent installed for DuckBotOS"
+        echo "   Dashboard: http://localhost:9119"
+        echo "   Gateway:   http://localhost:9110"
+        echo "   Config:    $REAL_HOME/.hermes"
+        echo ""
+        echo "   The Hermes gateway starts automatically at boot."
+        echo "   To restart: systemctl --user restart hermes-gateway"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

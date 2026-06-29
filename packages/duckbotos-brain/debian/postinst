@@ -1,0 +1,140 @@
+#!/bin/bash
+# postinst for duckbotos-brain
+# Installs DuckBot RAG Memory System as a pre-configured default in DuckBotOS
+
+set -e
+
+BRAIN_DIR="/opt/duckbotos/brain"
+REAL_HOME=$(getent passwd | awk -F: '$3 >= 1000 {print $6; exit}')
+REAL_USER=$(getent passwd | awk -F: '$3 >= 1000 {print $1; exit}')
+BRAIN_ENV="/etc/duckbotos/brain.env"
+BRAIN_SERVICE_DIR="/etc/systemd/system"
+SERVICE_USER=$(getent passwd | awk -F: '$3 >= 1000 && $3 < 65536 {print $1; exit}')
+
+case "$1" in
+    configure)
+        echo "[duckbotos-brain] Setting up DuckBotOS brain..."
+
+        # Clone or update duckbot-rag-memory
+        if [ ! -d "$BRAIN_DIR" ]; then
+            echo "[duckbotos-brain] Cloning duckbot-rag-memory..."
+            git clone --depth=1 --branch main \
+                https://github.com/Franzferdinan51/duckbot-rag-memory \
+                "$BRAIN_DIR"
+        else
+            echo "[duckbotos-brain] Updating existing brain install..."
+            (cd "$BRAIN_DIR" && git pull origin main --ff-only) || true
+        fi
+
+        # Create venv
+        echo "[duckbotos-brain] Creating Python venv..."
+        python3.12 -m venv "$BRAIN_DIR/.venv"
+        "$BRAIN_DIR/.venv/bin/pip" install --quiet -r "$BRAIN_DIR/requirements.txt"
+
+        # Write brain env config (LM Studio local embeddings — zero API cost)
+        mkdir -p /etc/duckbotos
+        cat > "$BRAIN_ENV" << 'ENVEOF'
+# DuckBotOS Brain — embedding provider config
+# LM Studio (local, GPU-accelerated — recommended)
+DUCKBOT_EMBEDDING=lmstudio
+LMSTUDIO_URL=http://127.0.0.1:1234/v1
+LMSTUDIO_MODEL=text-embedding-embeddinggemma-300m
+LMSTUDIO_RERANK_MODEL=qwen3-reranker-0.6b
+LMSTUDIO_API_KEY=sk-llm-studio
+# OpenAI (fallback — set key to enable)
+# DUCKBOT_EMBEDDING=openai
+# OPENAI_API_KEY=sk-...
+ENVEOF
+        chmod 644 "$BRAIN_ENV"
+
+        # Write MCP stdio server runner wrapper
+        mkdir -p /usr/bin
+        cat > /usr/bin/duckbotos-brain-mcp << 'MCPEOF'
+#!/bin/bash
+# Starts the DuckBotOS brain MCP stdio server
+# LM Studio must be running at localhost:1234 for local embeddings
+export $(grep -v '^#' /etc/duckbotos/brain.env | xargs)
+exec /opt/duckbotos/brain/.venv/bin/python -m src.mcp_server
+MCPEOF
+        chmod +x /usr/bin/duckbotos-brain-mcp
+
+        # Install OpenClaw native plugin (spawns Python MCP server, proxies 67 tools)
+        OPENCLAW_EXT_DIR="$REAL_HOME/.openclaw/extensions"
+        if [ -d "$BRAIN_DIR/extensions/duckbot-memory" ]; then
+            mkdir -p "$OPENCLAW_EXT_DIR"
+            cp -r "$BRAIN_DIR/extensions/duckbot-memory" "$OPENCLAW_EXT_DIR/"
+            echo "[duckbotos-brain] OpenClaw plugin installed to $OPENCLAW_EXT_DIR/duckbot-memory"
+        fi
+
+        # Write systemd user service for the brain watcher daemon
+        mkdir -p "/home/$SERVICE_USER/.config/systemd/user" 2>/dev/null || true
+        if [ -n "$SERVICE_USER" ] && [ -d "/home/$SERVICE_USER" ]; then
+            cat > "/home/$SERVICE_USER/.config/systemd/user/duckbotos-brain-watcher.service" << SVCEOF
+[Unit]
+Description=DuckBotOS Brain — file watcher daemon
+Documentation=https://github.com/Franzferdinan51/duckbot-rag-memory
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/duckbotos/brain.env
+ExecStart=/opt/duckbotos/brain/.venv/bin/python -m src.watcher
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+# Watch these paths for changes
+WorkingDirectory=/opt/duckbotos/brain
+
+[Install]
+WantedBy=default.target
+SVCEOF
+            chown "$SERVICE_USER:$SERVICE_USER" "/home/$SERVICE_USER/.config/systemd/user/duckbotos-brain-watcher.service" 2>/dev/null || true
+
+            # Enable lingering so the brain watcher runs without a logged-in user
+            loginctl --user enable-linger "$SERVICE_USER" 2>/dev/null || true
+            systemctl --user daemon-reload 2>/dev/null || true
+            systemctl --user enable duckbotos-brain-watcher.service 2>/dev/null || true
+            systemctl --user start duckbotos-brain-watcher.service 2>/dev/null || true
+        fi
+
+        # Initial bootstrap: ingest the DuckBotOS project docs into the brain
+        if [ -d "$BRAIN_DIR" ] && [ -f "$BRAIN_DIR/.venv/bin/python" ]; then
+            echo "[duckbotos-brain] Running initial brain bootstrap..."
+            # Ingest DuckBotOS workspace docs
+            if [ -d "/opt/duckbotos" ]; then
+                (cd "$BRAIN_DIR" && HOME="/home/$SERVICE_USER" \
+                    "$BRAIN_DIR/.venv/bin/python" -m src.cli ingest /opt/duckbotos \
+                    2>/dev/null || true)
+            fi
+            # Ingest OpenClaw workspace
+            if [ -d "/etc/openclaw" ] || [ -d "/root/.openclaw/workspace" ]; then
+                (cd "$BRAIN_DIR" && HOME="/home/$SERVICE_USER" \
+                    "$BRAIN_DIR/.venv/bin/python" -m src.cli ingest /root/.openclaw/workspace \
+                    2>/dev/null || true)
+            fi
+            echo "[duckbotos-brain] Bootstrap complete."
+        fi
+
+        # Register the brain plugin in openclaw.json (if OpenClaw is installed)
+        OPENCLAW_CFG="$REAL_HOME/.openclaw/openclaw.json"
+        if [ -f "$OPENCLAW_CFG" ]; then
+            # Register duckbot-memory plugin via openclaw CLI
+            if command -v openclaw >/dev/null 2>&1; then
+                openclaw plugins add duckbot-memory 2>/dev/null || true
+            fi
+            echo "[duckbotos-brain] OpenClaw plugin registered."
+        fi
+
+        echo "✅ DuckBotOS brain installed at $BRAIN_DIR"
+        echo "   MCP tools: duckbotos-brain-mcp (stdio server)"
+        echo "   OpenClaw plugin: $OPENCLAW_EXT_DIR/duckbotos-memory"
+        echo "   Config: $BRAIN_ENV"
+        echo "   Docs: https://github.com/Franzferdinan51/duckbot-rag-memory"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

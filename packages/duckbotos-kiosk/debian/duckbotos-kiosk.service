@@ -1,0 +1,46 @@
+[Unit]
+Description=DuckBotOS Kiosk — Weston + Chromium agent desktop
+Documentation=https://github.com/Franzferdinan51/DuckBotOS
+After=network-online.target duckbotos-hermes.service duckbotos-lm-studio.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root
+ExecStart=/usr/bin/duckbotos-kiosk-launch
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectHostname=true
+ProtectClock=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RemoveIPC=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Allow only needed capabilities
+AmbientCapabilities=CAP_SYS_NICE CAP_SYS_RAWIO
+
+# Environment
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=DUCKBOTOS_KIOSK_URL=http://localhost:9119
+
+# Wake on tty1 (auto-start kiosk on boot)
+ ExecStartPost=/bin/bash -c 'ln -snf /dev/tty1 /dev/active-tty 2>/dev/null || true'
+
+[Install]
+WantedBy=multi-user.target

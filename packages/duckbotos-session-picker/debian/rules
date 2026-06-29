@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install session picker files into package staging dir
+	mkdir -p debian/duckbotos-session-picker/usr/share/duckbotos/session-picker
+	mkdir -p debian/duckbotos-session-picker/usr/bin
+	mkdir -p debian/duckbotos-session-picker/lib/systemd/system
+
+	cp $(CURDIR)/index.html debian/duckbotos-session-picker/usr/share/duckbotos/session-picker/
+	cp $(CURDIR)/session-picker.py debian/duckbotos-session-picker/usr/bin/duckbotos-session-picker
+	cp $(CURDIR)/session-picker.service debian/duckbotos-session-picker/lib/systemd/system/
+	chmod +x debian/duckbotos-session-picker/usr/bin/duckbotos-session-picker

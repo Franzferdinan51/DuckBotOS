@@ -1,0 +1,18 @@
+Source: duckbotos-kiosk-openclaw
+Section: x11
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-kiosk-openclaw
+Architecture: amd64 arm64
+Depends: duckbotos-kiosk,
+         ${misc:Depends}
+Description: Pre-configure DuckBotOS kiosk for OpenClaw workspace
+ Configures /etc/duckbotos/kiosk-mode to load the OpenClaw workspace
+ (http://localhost:18789/plugins/openclawos) when the kiosk starts.
+ .
+ This package conflicts with duckbotos-kiosk-hermes — installing one
+ deconfigures the other.
+Conflicts: duckbotos-kiosk-hermes

@@ -1,0 +1,40 @@
+[Unit]
+Description=Hermes Agent Gateway
+Documentation=https://github.com/nousresearch/hermes-agent
+After=network-online.target lm-studio-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=duckets
+WorkingDirectory=%h
+Environment=HERMES_HOME=%h/.hermes
+Environment=HERMES_URL=http://localhost:9110
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:%h/.local/bin
+ExecStartPre=%h/.local/bin/hermes tools list
+ExecStart=%h/.local/bin/hermes gateway start --port 9110 --dashboard-port 9119
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=%h/.hermes %h/.local/share/hermes
+PrivateTmp=true
+# Allow network for API calls
+PrivateNetwork=false
+# Allow audio for voice features
+DevicePolicy=open
+# Allow access to USB for possible hardware
+DeviceAllow=/dev/usb/* rw
+
+# Environment
+Environment=HERMES_MODEL=auto
+Environment=HERMES_PROVIDER=minimax
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

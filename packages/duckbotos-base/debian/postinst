@@ -1,0 +1,44 @@
+#!/bin/bash
+# postinst for duckbotos-base
+# One-time system setup for DuckBotOS: directory layout + stamp files
+
+set -e
+
+case "$1" in
+    configure)
+        # Create the canonical DuckBotOS directory layout
+        mkdir -p /etc/duckbotos
+        mkdir -p /opt/duckbotos
+        mkdir -p /usr/share/duckbotos
+
+        # Stamp the install
+        echo "DuckBotOS v0.1.0 base" > /etc/duckbotos/version
+        echo "Base install: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /etc/duckbotos/version
+
+        # Default kiosk URL (overridden by -kiosk-hermes/openclaw/session-picker at runtime)
+        if [ ! -f /etc/duckbotos/kiosk-mode ] && [ ! -L /etc/duckbotos/kiosk-mode ]; then
+            echo "http://localhost:9119" > /etc/duckbotos/kiosk-mode
+        fi
+
+        # Defaults file (for kiosk launcher to read kiosk URL without hardcoding)
+        if [ ! -f /etc/duckbotos/defaults.conf ]; then
+            cat > /etc/duckbotos/defaults.conf << 'DEFAULTS'
+# DuckBotOS defaults — read by /usr/bin/duckbotos-kiosk-launch and others
+DUCKBOTOS_VERSION=0.1.0
+DUCKBOTOS_BASE=ubuntu-24.04
+DUCKBOTOS_KIOSK_URL_DEFAULT=http://localhost:9119
+DUCKBOTOS_LM_STUDIO_URL=http://127.0.0.1:1234/v1
+DUCKBOTOS_OPENCLAW_URL=http://localhost:18789
+DUCKBOTOS_HERMES_URL=http://localhost:9119
+DUCKBOTOS_BRAIN_PATH=/opt/duckbotos/brain
+DEFAULTS
+            chmod 644 /etc/duckbotos/defaults.conf
+        fi
+
+        echo "[duckbotos-base] DuckBotOS base layout created at /etc/duckbotos"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

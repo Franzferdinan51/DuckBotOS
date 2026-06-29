@@ -1,41 +1,38 @@
 Source: duckbotos-computer-use
-Section: admin
+Section: ai
 Priority: optional
-Maintainer: DuckBotOS Team <team@duckbotos.ai>
-Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.7.0
-Homepage: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
-Rules-Requires-Root: no
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13), git, nodejs (>= 18)
+Standards-Version: 4.6.2
 
 Package: duckbotos-computer-use
-Architecture: all
-Depends: ${misc:Depends},
- python3,
- python3-pip,
- at-spi2-core,
- libatspi2.0-0,
-gir1.2-atspi-2.0,
- libwayland-client0,
- libwayland-cursor0,
- xdg-desktop-portal-wlr,
- wlrb,
- python3-yaml,
- python3-typing-extensions
-Description: DuckBotOS computer-use — desktop automation MCP server
- Installs computer-use-linux as a systemd-per-user MCP server for
- automated desktop interaction and accessibility-driven control.
+Architecture: amd64 arm64
+Depends: python3.12, python3-pip, git, xdotool, scrot, gnome-screenshot,
+         weston (>= 10),
+         ${misc:Depends}
+Recommends: duckbotos-cua-bridge,
+            trycua-driver,
+Suggests: adb,
+Description: DuckBotOS desktop control — Newest Desktop Control (Lobster Edition)
+ Installs Duckets' MIT-licensed `desktop-control-lobster-edition-skill`
+ MCP server for full desktop control of the Weston kiosk session:
  .
- AT-SPI2 accessibility bus integration for reading UI elements.
- Wayland portal for screen capture and input events.
- MCP protocol server exposing desktop automation to Hermes/OpenClaw.
+   • Screenshots, mouse, keyboard, clipboard (PyAutoGUI + AT-SPI2)
+   • App launching, window activation, file I/O, terminal
+   • Android ADB control (if adb installed)
+   • Codex Computer Use detection (macOS)
+   • 20+ MCP tools registered automatically with Hermes/OpenClaw
  .
- Per-user systemd service: computer-use@username.service
- Config: ~/.config/computer-use-linux.yaml
- Socket: ~/.computer-use/computer-use.sock (user-owned Unix socket)
- MCP:    http://127.0.0.1:18765/mcp (localhost only)
+ Installed at /opt/duckbotos/desktop-control/
+ MCP entrypoint: node /opt/duckbotos/desktop-control/src/server.js
  .
- Requires Wayland session (Weston kiosk in DuckBotOS).
- Not compatible with X11-only sessions.
- Requires active user session with accessibility bus running.
+ Service: /etc/systemd/system/duckbotos-desktop-control.service
+          (runs as the kiosk user, AUTO-START on boot)
+ .
+ Wires into Hermes (port 9119) and OpenClaw (port 18789) automatically:
+   • Hermes: posts MCP config to ~/.hermes/mcp-servers.json
+   • OpenClaw: patches openclaw.json → plugins.entries.desktop-control
+   • Both: enables plugin and restarts the gateway service
+ .
+ Optional: install duckbotos-cua-bridge to expose trycua's cua-driver
+ as an alternative backend (the Lobster Edition's `setup:cua` target).

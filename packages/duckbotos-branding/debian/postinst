@@ -1,0 +1,28 @@
+#!/bin/bash
+# postinst for duckbotos-branding
+# Registers Plymouth theme and writes DuckBotOS identity marker
+
+set -e
+
+case "$1" in
+    configure)
+        # Register Plymouth theme
+        if [ -f /usr/share/plymouth/themes/duckbotos/duckbotos.plymouth ]; then
+            update-alternatives --install \
+                /usr/share/plymouth/themes/default.plymouth default.plymouth \
+                /usr/share/plymouth/themes/duckbotos/duckbotos.plymouth 200 2>/dev/null || true
+            update-alternatives --set default.plymouth \
+                /usr/share/plymouth/themes/duckbotos/duckbotos.plymouth 2>/dev/null || true
+            plymouth-set-default-theme duckbotos 2>/dev/null || true
+        fi
+        # Write DuckBotOS identity marker
+        mkdir -p /etc/duckbotos
+        echo "DuckBotOS v0.1.0 (Ubuntu 24.04 base)" > /etc/duckbotos/version
+        echo "Installed: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /etc/duckbotos/version
+        echo "[duckbotos-branding] Branding installed — Plymouth theme + MOTD + shell prompt"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

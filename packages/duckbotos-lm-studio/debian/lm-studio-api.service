@@ -1,0 +1,33 @@
+[Unit]
+Description=LM Studio API Server
+Documentation=https://lmstudio.ai/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lm-studio
+Group=lm-studio
+ExecStartPre=/bin/mkdir -p /var/lib/lm-studio/models /var/lib/lm-studio/downloads
+ExecStartPre=/bin/chown -R lm-studio:lm-studio /var/lib/lm-studio
+ExecStart=/usr/bin/lm-studio serve \
+    --host 127.0.0.1 \
+    --port 1234 \
+    --models-dir /var/lib/lm-studio/models \
+    --gpu \
+    --context-length 4096
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/lm-studio
+PrivateTmp=true
+Environment=LM_STUDIO_CONFIG=/etc/lm-studio/config.yaml
+
+[Install]
+WantedBy=multi-user.target

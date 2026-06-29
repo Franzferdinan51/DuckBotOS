@@ -1,0 +1,33 @@
+#!/bin/bash
+# postinst for duckbotos-session-picker
+# Installs the DuckBotOS session picker web UI
+
+set -e
+
+case "$1" in
+    configure)
+        # Install the session picker web app
+        mkdir -p /usr/share/duckbotos/session-picker
+        cp /usr/share/duckbotos/session-picker/index.html /usr/share/duckbotos/session-picker/index.html.bak 2>/dev/null || true
+        # (actual copy handled by debian/rules file copying)
+
+        # Install the Python server
+        mkdir -p /usr/bin
+        cp /usr/bin/duckbotos-session-picker /usr/bin/duckbotos-session-picker.bak 2>/dev/null || true
+        # (actual copy handled by debian/rules)
+
+        # Enable and start the session picker service
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl daemon-reload 2>/dev/null || true
+            systemctl enable duckbotos-session-picker.service 2>/dev/null || true
+            systemctl start duckbotos-session-picker.service 2>/dev/null || true
+        fi
+
+        echo "✅ DuckBotOS Session Picker installed"
+        echo "   URL: http://localhost:8080"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

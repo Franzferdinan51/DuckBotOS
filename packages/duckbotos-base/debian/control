@@ -1,47 +1,44 @@
 Source: duckbotos-base
 Section: admin
-Priority: optional
-Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Priority: required
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
 Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.7.0
-Homepage: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
-Rules-Requires-Root: no
+Standards-Version: 4.6.2
 
 Package: duckbotos-base
-Architecture: all
-Depends: ${misc:Depends},
- ubuntu-desktop-minimal,
- weston,
- xdg-desktop-portal,
- xdg-utils,
- curl,
- wget,
- git,
- htop,
- tmux,
- fish,
- openssh-client,
- ufw,
- unattended-upgrades,
- apparmor,
- apparmor-utils,
- firejail
-Description: DuckBotOS base system — Weston kiosk + shell utilities
- Minimal base package for DuckBotOS. Installs Weston compositor
- in kiosk mode, agent-facing shell utilities, and security tooling.
+Architecture: amd64 arm64
+Essential: yes
+Priority: required
+Depends: 
+    # Core OS essentials
+    ubuntu-standard,
+    ubuntu-server,
+    openssh-server,
+    systemd,
+    udev,
+    # Build tools
+    curl, wget, git, jq, zip, unzip, tar, gzip,
+    # Python runtime (Hermes + agents)
+    python3, python3-pip, python3-venv, python3-yaml, python3-requests, python3-aiohttp, python3-pygame,
+    # Node runtime (OpenClaw)
+    nodejs, npm,
+    # System utilities
+    htop, tree, vim, nano, rsync, ncdu, strace, lsof, net-tools, iproute2, iputils-ping,
+    # Audio (Hermes voice features)
+    libportaudio2, alsa-utils, pulseaudio,
+    # Display / Wayland
+    weston, xwayland, wayland-protocols, libwayland-bin,
+    # Security
+    ufw, fail2ban, apt-listbugs,
+    ${misc:Depends}
+Description: DuckBotOS base system — required for all install modes
+ This is the base package that all DuckBotOS install modes depend on.
+ It provides the minimal Ubuntu 24.04 system with:
+ - Ubuntu Server base + standard utils
+ - Python 3 + pip (Hermes, OpenClaw, skills)
+ - Node.js 18+ (OpenClaw)
+ - Weston compositor (kiosk shell)
+ - Audio support (voice features)
+ - Basic system monitoring and security tools
  .
- Does NOT include any AI/agent packages — those are in the
- mode-specific packages (duckbotos-hermes, duckbotos-openclaw, etc.).
- .
- Installs:
-  - Weston compositor (kiosk/windowed modes)
-  - xdg-desktop-portal (Wayland portal for screen capture, file dialogs)
-  - fish shell (interactive shell for agents)
-  - tmux (terminal multiplexer for sub-agent sessions)
-  - firejail + AppArmor (security sandboxing)
-  - unattended-upgrades (automated security updates)
-  - ufw (uncomplicated firewall)
- .
- Port 5900: VNC for remote desktop access (disabled by default)
+ This package is Essential and Priority=required — it cannot be removed.

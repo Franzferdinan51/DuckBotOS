@@ -1,0 +1,20 @@
+Source: duckbotos-session-picker
+Section: x11
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-session-picker
+Architecture: amd64 arm64
+Depends: python3, systemctl,
+         ${misc:Depends}
+Description: DuckBotOS session picker — choose Hermes / OpenClaw / Hybrid at boot
+ Provides a beautiful web-based session picker UI served on port 8080.
+ This is what Both/Hybrid mode users see when they boot DuckBotOS —
+ a dark-themed UI with cards for Hermes, OpenClaw, and Hybrid GNOME
+ workstation modes. Keyboard navigable (1/2/3 to select, Enter to launch).
+ .
+ The picker runs as a systemd service (duckbotos-session-picker.service)
+ and writes the selected mode to /etc/duckbotos/kiosk-mode so the kiosk
+ knows which agent dashboard URL to load.

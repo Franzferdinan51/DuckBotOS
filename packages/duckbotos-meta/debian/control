@@ -1,155 +1,85 @@
 Source: duckbotos-meta
-Section: admin
+Section: metapackages
 Priority: optional
-Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
 Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.7.0
-Homepage: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
-Rules-Requires-Root: no
+Standards-Version: 4.6.2
+
+Package: duckbotos-mode-hermes
+Architecture: amd64 arm64
+Depends: duckbotos-base,
+         duckbotos-lm-studio,
+         duckbotos-browseros,
+         duckbotos-computer-use,
+         duckbotos-cua-bridge,
+         duckbotos-kiosk,
+         duckbotos-kiosk-hermes,
+         duckbotos-brain,
+         duckbotos-hermes,
+         python3-pip, python3-venv, python3-yaml, python3-requests,
+         curl, wget, git,
+         ${misc:Depends}
+Description: DuckBotOS Hermes-only install mode
+ Installs Hermes (NousResearch) as the primary agent with the full DuckBotOS
+ stack: Hermes agent, web dashboard, LM Studio, BrowserOS,
+ Newest Desktop Control (computer-use), trycua/cua bridge, Weston kiosk shell,
+ duckbot-rag-memory brain (default), and the Hermes kiosk configuration.
+ .
+ This is the "Hermes-only" install mode (DUCKBOTOS_MODE=hermes).
+Choose this if you want a single-agent focused experience.
+
+Package: duckbotos-mode-openclaw
+Architecture: amd64 arm64
+Depends: duckbotos-base,
+         duckbotos-lm-studio,
+         duckbotos-browseros,
+         duckbotos-computer-use,
+         duckbotos-cua-bridge,
+         duckbotos-kiosk,
+         duckbotos-brain,
+         duckbotos-openclaw,
+         nodejs, npm,
+         ${misc:Depends}
+Description: DuckBotOS OpenClaw-only install mode
+ Installs OpenClaw as the primary agent with the full DuckBotOS stack:
+ OpenClaw gateway, openclaw-os plugin, LM Studio, BrowserOS,
+ Newest Desktop Control (computer-use), trycua/cua bridge, Weston kiosk shell,
+ and duckbot-rag-memory brain (default).
+ .
+ This is the "OpenClaw-only" install mode (DUCKBOTOS_MODE=openclaw).
+Choose this if you want OpenClaw as your primary desktop agent.
+
+Package: duckbotos-mode-hybrid
+Architecture: amd64 arm64
+Depends: duckbotos-base,
+         duckbotos-lm-studio,
+         duckbotos-browseros,
+         duckbotos-computer-use,
+         duckbotos-cua-bridge,
+         duckbotos-kiosk,
+         duckbotos-brain,
+         duckbotos-hermes,
+         duckbotos-openclaw,
+         duckbotos-session-picker,
+         gdm3, gnome-session,
+         ${misc:Depends}
+Description: DuckBotOS hybrid install mode (Hermes + OpenClaw)
+ Installs both Hermes and OpenClaw with the DuckBotOS session picker.
+ At boot, users see a choice between:
+ .
+   [1] Hermes    — Fullscreen kiosk with Hermes Web Dashboard
+   [2] OpenClaw  — Fullscreen kiosk with OpenClaw workspace
+   [3] Hybrid    — GNOME desktop with both agents in a side panel
+ .
+ This is the most feature-complete DuckBotOS experience (DUCKBOTOS_MODE=hybrid).
+ Both agents are always running; you pick which interface to use per-session.
 
 Package: duckbotos-meta
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- duckbotos-hermes,
- duckbotos-openclaw,
- duckbotos-lm-studio,
- duckbotos-browseros,
- duckbotos-computer-use
-Description: DuckBotOS — Agent-first Linux with Hermes + OpenClaw
- DuckBotOS is an Ubuntu-based Linux distribution where AI agents are
- the primary desktop interface. Boot into Hermes, OpenClaw, or a
- hybrid workstation mode.
- .
- This meta-package installs the complete DuckBotOS experience:
-  - Hermes agent OS as the primary shell/UI
-  - OpenClaw as a verified/secondary agent
-  - LM Studio as a first-class local model provider
-  - BrowserOS as the default agentic web browser
-  - Newest Desktop Control (Lobster Edition) for desktop automation
-  - Weston kiosk for agent dashboard display
- .
- Supports NVIDIA, AMD, and CPU-only hardware targets.
- Requires Ubuntu 24.04 LTS (Noble Numbat).
-
-Package: duckbotos-base
-Architecture: all
-Depends: ${misc:Depends},
- ubuntu-desktop-minimal,
- weston,
- xdg-desktop-portal,
- xdg-utils,
- curl,
- wget,
- git,
- htop,
- tmux,
- fish,
- openssh-client,
- ufw,
- unattended-upgrades,
- apparmor,
- apparmor-utils,
- firejail
-Description: DuckBotOS base system — Weston kiosk + shell utilities
- Minimal base for DuckBotOS. Installs Weston compositor (kiosk mode),
- agent-facing shell utilities, and security tooling (AppArmor, firejail).
- .
- Installs no AI/agent packages — those are in mode-specific packages.
-
-Package: duckbotos-hermes
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- hermesos-agent
-Description: DuckBotOS Hermes agent mode
- Installs Hermes as the primary desktop agent for DuckBotOS.
- Hermes boots as a fullscreen shell replacing the traditional desktop.
- .
- Includes:
-  - hermesos-agent (primary agent daemon)
-  - hermes-nlpkg (natural language package manager)
-  - hermesos-watchdog (predictive resource orchestrator)
-  - OpenAI-compatible REST API on port 8000
-  - Hermes tools exposed via D-Bus and Unix socket IPC
- .
- This is the primary "AI-first" experience.
-
-Package: duckbotos-openclaw
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- openclaw-agent
-Description: DuckBotOS OpenClaw agent mode
- Installs OpenClaw as the primary desktop agent for DuckBotOS.
- OpenClaw boots as a fullscreen agent interface.
- .
- Includes:
-  - openclaw-agent (agent daemon, port 18797)
-  - openclaw-gateway (MCP bridge, port 3850)
-  - ACP protocol server (port 18794)
-  - WebSocket streaming (port 18796)
-  - Sub-conscious memory daemon (port 4001)
-  - Agent mesh networking (port 4000)
- .
- Use for OpenClaw-native workflows.
-
-Package: duckbotos-lm-studio
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- lm-studio-server
-Description: DuckBotOS LM Studio — local model provider
- Installs LM Studio as a first-class local model provider for DuckBotOS.
- .
- Includes:
-  - llmster daemon (headless model server)
-  - lms CLI (model management, port 1234)
-  - OpenAI-compatible REST API (/v1 endpoints)
-  - JIT model loading (auto-loads on first inference request)
-  - GPU-accelerated inference (CUDA/ROCm when available)
-  - Systemd service: lmstudio.service
- .
- Models are managed from the OS UI or via `lms` CLI.
- Default model install path: ~/.lmstudio/models/
-
-Package: duckbotos-browseros
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- browseros
-Description: DuckBotOS BrowserOS — default agentic web browser
- Installs BrowserOS as the default agentic web browser for DuckBotOS.
- .
- Includes:
-  - BrowserOS Chromium fork (agent-capable browser)
-  - browseros-cli (Bun MCP server, port 9003)
-  - 53+ browser automation tools via MCP protocol
-  - Agent mode (Claude Opus 4.5, or any OpenAI-compatible model)
-  - Chat mode (any model including LM Studio local models)
- .
- Set as default browser via update-alternatives.
- Registered as x-www-browser for OS-wide use.
- Note: browseros-cli `status` command is known to report
- "disconnected" even when working — use `health` and `pages` instead.
-
-Package: duckbotos-computer-use
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- computer-use-linux
-Description: DuckBotOS computer-use — Newest Desktop Control (Lobster Edition)
- Installs computer-use-linux as a systemd-per-user MCP server for
- automated desktop interaction and accessibility-driven control.
- .
- Includes:
-  - AT-SPI2 accessibility bus integration
-  - Wayland portal for screen capture and input
-  - MCP protocol server for OpenClaw/Hermes tool calling
-  - Per-user systemd service: computer-use@username.service
-  - Configurable via ~/.config/computer-use-linux.yaml
- .
- Requires Wayland session (Weston kiosk in DuckBotOS).
- Not compatible with X11-only sessions.
+Architecture: amd64 arm64
+Depends: duckbotos-mode-hermes
+Description: DuckBotOS default meta-package (Hermes mode)
+ Default DuckBotOS installation. Pulls in Hermes mode by default.
+ To install OpenClaw or Hybrid mode, install duckbotos-mode-openclaw
+ or duckbotos-mode-hybrid instead.
+ Conflicts: duckbotos-mode-openclaw, duckbotos-mode-hybrid
+Suggests: duckbotos-docs

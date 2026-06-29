@@ -1,41 +1,31 @@
 Source: duckbotos-openclaw
-Section: admin
+Section: science
 Priority: optional
-Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
 Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.7.0
-Homepage: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
-Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
-Rules-Requires-Root: no
+Standards-Version: 4.6.2
+Vcs-Browser: https://github.com/openclaw/openclaw
 
 Package: duckbotos-openclaw
-Architecture: all
-Depends: ${misc:Depends},
- duckbotos-base,
- nodejs (>= 18),
- npm,
- sqlite3,
- curl,
- git,
- fish
-Description: DuckBotOS OpenClaw agent mode — verified secondary agent
- Installs OpenClaw as the primary desktop agent for DuckBotOS.
- OpenClaw boots as a fullscreen agent interface, providing a verified
- secondary agent that can spawn sub-agents, manage memory, and coordinate
- with Hermes via the agent bus.
+Architecture: amd64 arm64
+Depends: duckbotos-base,
+         duckbotos-brain,
+         nodejs (>= 18),
+         npm,
+         ${misc:Depends}
+Description: OpenClaw as primary desktop environment for DuckBotOS
+ Installs OpenClaw as the primary AI agent and desktop surface
+ for DuckBotOS.
  .
- Ports:
-   18797 — Chat agent (main agent interface)
-   18794 — ACP protocol server (agent-to-agent communication)
-   18796 — WebSocket streaming (real-time streaming responses)
-   3850  — MCP protocol bridge (tool exposure to external systems)
-   4000  — Agent mesh networking (peer discovery + broadcast)
-   4001  — Sub-conscious memory daemon (LLM-powered long-term memory)
+ OpenClaw provides:
+ - Gateway API at http://localhost:18789
+ - openclaw-os web workspace plugin at /plugins/openclawos
+ - 40+ built-in tools (shell, file, browser, memory, sub-agents, cron)
+ - Multi-channel messaging (Telegram, Signal, etc.)
+ - Sub-conscious daemon for long-term memory and pattern recognition
+ - Hybrid orchestrator for task routing
  .
- Sub-agents: sessions_spawn with MiniMax, Grok, or LM Studio backends.
- MCP tools: 64+ DuckBot Brain memory tools, desktop control, shell exec.
- GDM session "DuckBotOS OpenClaw" boots directly to OpenClaw dashboard.
+ In DuckBotOS, OpenClaw runs as a systemd user service and the
+ Weston kiosk loads the openclaw-os workspace in fullscreen Chromium.
  .
- Compatible with Hermes for dual-agent hybrid mode (P4).
- Agent mesh allows spawning sub-agents across multiple machines.
+ Homepage: https://github.com/openclaw/openclaw

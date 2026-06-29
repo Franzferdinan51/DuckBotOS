@@ -1,0 +1,26 @@
+#!/bin/bash
+# postinst for duckbotos-browseros — set BrowserOS as default browser
+
+set -e
+
+BROWSEROS_BIN="/usr/bin/browseros"
+BROWSEROS_APP="/usr/share/applications/browseros.desktop"
+
+case "$1" in
+    configure)
+        # Set BrowserOS as default browser
+        if [ -f "$BROWSEROS_APP" ] && command -v xdg-settings >/dev/null 2>&1; then
+            xdg-settings set default-web-browser browseros.desktop 2>/dev/null || true
+        fi
+
+        # Also set via update-alternatives if chromium is present
+        if [ -f /usr/bin/chromium ] && [ -f /usr/bin/google-chrome ] && [ -f "$BROWSEROS_BIN" ]; then
+            update-alternatives --install /usr/bin/x-www-browser x-www-browser "$BROWSEROS_BIN" 100 2>/dev/null || true
+            update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser "$BROWSEROS_BIN" 100 2>/dev/null || true
+        fi
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

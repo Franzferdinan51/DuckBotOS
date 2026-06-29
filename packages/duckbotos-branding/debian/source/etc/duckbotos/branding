@@ -1,0 +1,23 @@
+# DuckBotOS Branding
+# Sets up shell prompt, colors, and terminal aesthetics for DuckBotOS
+# Loaded by /etc/profile.d/duckbotos-branding.sh
+
+if [ -n "$PS1" ]; then
+    # DuckBotOS colored prompt: gold + cyan
+    PS1='\[\033[01;33m\]🦆 DuckBotOS\[\033[00m\]:\[\033[01;36m\]\w\[\033[00m\]\$ '
+    export PS1
+
+    # Terminal title
+    case "$TERM" in
+        xterm*|rxvt*|Eterm|aterm|kterm|gnome*|alacritty|st-256color)
+            PROMPT_COMMAND='echo -ne "\033]0;DuckBotOS — ${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+            ;;
+    esac
+fi
+
+# ls colors (use default if available)
+export CLICOLOR=1
+export LSCOLORS=ExFxBxDxCxegedabagacad
+
+# Default browser for xdg-open
+export BROWSER=browseros

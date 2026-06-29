@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install kiosk launcher and systemd service
+	mkdir -p debian/duckbotos-kiosk/usr/bin
+	mkdir -p debian/duckbotos-kiosk/lib/systemd/system
+	mkdir -p debian/duckbotos-kiosk/etc/duckbotos
+
+	cp debian/duckbotos-kiosk-launch.sh debian/duckbotos-kiosk/usr/bin/
+	cp debian/duckbotos-kiosk.service debian/duckbotos-kiosk/lib/systemd/system/
+	chmod +x debian/duckbotos-kiosk/usr/bin/duckbotos-kiosk-launch.sh

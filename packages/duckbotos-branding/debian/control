@@ -1,0 +1,21 @@
+Source: duckbotos-branding
+Section: graphics
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-branding
+Architecture: all
+Depends: plymouth, gdm3,
+         ${misc:Depends}
+Description: DuckBotOS branding — Plymouth theme, GDM, MOTD, wallpapers
+ Provides the DuckBotOS visual identity:
+ - Plymouth boot splash screen with DuckBotOS logo
+ - GDM theme (login screen with DuckBotOS branding)
+ - MOTD (Message of the Day) with DuckBotOS info
+ - Desktop wallpaper (DuckBotOS logo on dark background)
+ - Shell prompt customization (/etc/profile.d/)
+ .
+ This package is installed by all modes but is Architecture:all
+ so it doesn't affect cross-arch builds.

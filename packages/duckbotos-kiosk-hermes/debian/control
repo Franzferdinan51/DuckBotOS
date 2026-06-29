@@ -1,0 +1,18 @@
+Source: duckbotos-kiosk-hermes
+Section: x11
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-kiosk-hermes
+Architecture: amd64 arm64
+Depends: duckbotos-kiosk,
+         ${misc:Depends}
+Description: Pre-configure DuckBotOS kiosk for Hermes dashboard
+ Configures /etc/duckbotos/kiosk-mode to load the Hermes Web Dashboard
+ (http://localhost:9119) when the kiosk starts.
+ .
+ This package conflicts with duckbotos-kiosk-openclaw — installing one
+ deconfigures the other.
+Conflicts: duckbotos-kiosk-openclaw

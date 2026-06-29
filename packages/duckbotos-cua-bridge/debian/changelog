@@ -1,0 +1,8 @@
+duckbotos-cua-bridge (0.1.0) stable; urgency=medium
+
+  * Initial DuckBotOS release.
+    - trycua/cua Python SDK + driver + sandbox
+    - cua-driver MCP server registration in openclaw.json
+    - /usr/local/bin/cua CLI wrapper
+
+ -- DuckBotOS Team <duckets@duckbotos.dev>  Mon, 29 Jun 2026 17:00:00 +0000

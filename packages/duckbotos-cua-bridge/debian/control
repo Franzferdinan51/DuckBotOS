@@ -1,0 +1,35 @@
+Source: duckbotos-cua-bridge
+Section: ai
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-cua-bridge
+Architecture: amd64 arm64
+Depends: python3.12, python3-pip, git, curl, ca-certificates,
+         duckbotos-computer-use,
+         ${misc:Depends}
+Description: DuckBotOS — trycua/cua bridge for VM orchestration + computer-use backend
+ Installs the trycua/cua bridge used by DuckBotOS for two purposes:
+ .
+   1. **Sandbox layer** — programmatically spin up Linux/macOS/Windows
+      VMs and containers for test runtimes, agent sandboxes, and the
+      DuckBotOS build pipeline. Python SDK: `pip install cua`. Same API
+      regardless of OS or runtime.
+ .
+   2. **Computer-use backend** — `cua-driver` runs as an MCP stdio server
+      for desktop control, complementing the local Newest Desktop Control
+      (Lobster Edition). Already tested with OpenClaw; Linux backend is
+      pre-release (matches DuckBotOS's needs).
+ .
+ Setup:
+   • Install: pip install cua cua-driver
+   • Hermes:  claude mcp add --transport stdio cua-driver -- cua-driver mcp
+   • OpenClaw: cua-driver plugin registered in openclaw.json via postinst
+ .
+ Reference: https://github.com/trycua/cua
+ .
+ This package is OPTIONAL — DuckBotOS works fine without it. Install to
+ enable programmatic VM orchestration + add cua as a second computer-use
+ backend alongside Newest Desktop Control.

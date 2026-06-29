@@ -1,0 +1,39 @@
+Source: duckbotos-hybrid
+Section: metapackages
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-hybrid
+Architecture: amd64 arm64
+Depends: duckbotos-base,
+         duckbotos-hermes,
+         duckbotos-openclaw,
+         duckbotos-lm-studio,
+         duckbotos-browseros,
+         duckbotos-computer-use,
+         duckbotos-cua-bridge,
+         duckbotos-kiosk,
+         duckbotos-kiosk-hermes,
+         duckbotos-kiosk-openclaw,
+         duckbotos-session-picker,
+         duckbotos-brain,
+         gdm3,
+         gnome-session,
+         ${misc:Depends}
+Description: DuckBotOS hybrid mode — Hermes + OpenClaw with session picker
+ Installs both Hermes and OpenClaw agents along with the DuckBotOS
+ session picker web UI. At boot, users see a choice between:
+ .
+   [1] Hermes    — Fullscreen kiosk with Hermes Web Dashboard
+   [2] OpenClaw  — Fullscreen kiosk with OpenClaw workspace
+   [3] Hybrid    — GNOME desktop with both agents in a side panel
+ .
+ This is the most feature-complete DuckBotOS experience. Both agents
+ are always running; you pick which interface to use per-session.
+ .
+ Dual-agent IPC: Hermes and OpenClaw coordinate via the agent bus
+ (/run/hermes-claw/agent-bus.sock) and share the Newest Desktop Control
+ (Lobster Edition) MCP server for desktop control, plus trycua/cua for
+ programmatic VM orchestration.

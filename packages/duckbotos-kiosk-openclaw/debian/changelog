@@ -1,0 +1,5 @@
+duckbotos-kiosk-openclaw (0.1.0) unstable; urgency=medium
+
+  * Pre-configure DuckBotOS kiosk to load OpenClaw workspace.
+
+ -- DuckBotOS Team <duckets@duckbotos.dev>  Mon, 29 Jun 2026 15:30:00 -0400

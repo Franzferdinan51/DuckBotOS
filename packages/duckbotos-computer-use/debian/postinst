@@ -1,0 +1,157 @@
+#!/bin/bash
+# postinst for duckbotos-computer-use
+# Installs Duckets' local "Newest Desktop Control" (Lobster Edition)
+# Wires into Hermes mcp_servers (stringified) and OpenClaw mcp.servers (nested)
+
+set -e
+
+NDC_DIR="/opt/duckbotos/desktop-control"
+NDC_REPO="https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill"
+REAL_HOME=$(getent passwd | awk -F: '$3 >= 1000 {print $6; exit}')
+REAL_USER=$(getent passwd | awk -F: '$3 >= 1000 {print $1; exit}')
+NDC_PATH="$NDC_DIR/src/server.js"
+
+case "$1" in
+    configure)
+        echo "[duckbotos-computer-use] Installing Newest Desktop Control (Lobster Edition)..."
+
+        # 1. Clone or update the repo
+        if [ ! -d "$NDC_DIR" ]; then
+            git clone --depth=1 --branch main "$NDC_REPO" "$NDC_DIR"
+        else
+            (cd "$NDC_DIR" && git pull origin main --ff-only) || true
+        fi
+
+        # 2. Install Python dependencies
+        echo "[duckbotos-computer-use] Installing Python dependencies..."
+        if command -v pip3 >/dev/null 2>&1; then
+            pip3 install --break-system-packages --quiet -r "$NDC_DIR/requirements.txt" 2>&1 | tail -5 || true
+        fi
+
+        # 3. Run install.sh
+        echo "[duckbotos-computer-use] Running install.sh..."
+        bash "$NDC_DIR/scripts/install.sh" --no-tests --no-config 2>&1 | tail -10 || true
+
+        # 4. Set permissions
+        chown -R "$REAL_USER:$REAL_USER" "$NDC_DIR" 2>/dev/null || true
+        chmod +x "$NDC_DIR/src/server.js"
+
+        # 5. Use Duckets' own setup-config.js to generate the canonical MCP server config
+        # target=openclaw emits {"mcpServers":{"newest-desktop-control":{...}}} (generic gateway format)
+        SETUP_OUT=$(cd "$NDC_DIR" && node scripts/setup-config.js openclaw --no-pretty --path "$NDC_PATH" 2>/dev/null | awk '/^\\{/{flag=1} flag; /^\\}/{flag=0}')
+        if [ -z "$SETUP_OUT" ] || ! echo "$SETUP_OUT" | python3 -c "import json,sys; json.loads(sys.stdin.read())" 2>/dev/null; then
+            SETUP_OUT='{"mcpServers":{"newest-desktop-control":{"command":"node","args":["'"$NDC_PATH"'"],"env":{},"transport":"stdio","startup_timeout_sec":20,"tool_timeout_sec":60}}}'
+        fi
+
+        # 6. Install systemd service
+        cat > /etc/systemd/system/duckbotos-desktop-control.service << SVCEOF
+[Unit]
+Description=DuckBotOS Newest Desktop Control MCP server (Lobster Edition)
+Documentation=https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill
+After=graphical.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=${REAL_USER:-root}
+WorkingDirectory=${NDC_DIR}
+ExecStart=/usr/bin/node ${NDC_DIR}/src/server.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SupplementaryGroups=video input tty
+PAMName=login
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=false
+ReadWritePaths=${NDC_DIR} /tmp /run/user/${REAL_USER:-0}
+PrivateTmp=true
+DevicePolicy=closed
+DeviceAllow=char-pts rw
+DeviceAllow=/dev/tty rw
+DeviceAllow=/dev/dri rw
+DeviceAllow=/dev/input rw
+
+[Install]
+WantedBy=graphical.target
+SVCEOF
+
+        systemctl daemon-reload 2>/dev/null || true
+        systemctl enable duckbotos-desktop-control.service 2>/dev/null || true
+        systemctl start duckbotos-desktop-control.service 2>/dev/null || true
+
+        # 7. Wire into Hermes — format is mcp_servers.{name} = JSON-stringified inner config
+        HERMES_CFG="$REAL_HOME/hermes-config.json"
+        if [ -n "$REAL_USER" ] && [ -f "$HERMES_CFG" ]; then
+            chown "$REAL_USER:$REAL_USER" "$HERMES_CFG" 2>/dev/null || true
+            python3 - << PYEOF
+import json
+cfg = '$HERMES_CFG'
+setup_out = '''${SETUP_OUT}'''
+setup_data = json.loads(setup_out)
+with open(cfg) as f:
+    data = json.load(f)
+if 'mcp_servers' not in data:
+    data['mcp_servers'] = {}
+# Hermes format: each MCP server value is a JSON-STRINGIFIED inner config object
+for name, server_cfg in setup_data.get('mcpServers', {}).items():
+    data['mcp_servers'][name] = json.dumps(server_cfg)
+with open(cfg, 'w') as f:
+    json.dump(data, f, indent=2)
+print('[duckbotos-computer-use] Hermes mcp_servers updated at ' + cfg)
+PYEOF
+        fi
+
+        # 8. Wire into OpenClaw — format is mcp.servers.{name} (nested under "mcp", not top-level)
+        OPENCLAW_CFG="$REAL_HOME/.openclaw/openclaw.json"
+        if [ -n "$REAL_USER" ]; then
+            mkdir -p "$REAL_HOME/.openclaw"
+            chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.openclaw" 2>/dev/null || true
+            [ -f "$OPENCLAW_CFG" ] || echo '{}' > "$OPENCLAW_CFG"
+            chown "$REAL_USER:$REAL_USER" "$OPENCLAW_CFG" 2>/dev/null || true
+            python3 - << PYEOF
+import json
+cfg = '$OPENCLAW_CFG'
+setup_out = '''${SETUP_OUT}'''
+setup_data = json.loads(setup_out)
+with open(cfg) as f:
+    data = json.load(f)
+if 'mcp' not in data:
+    data['mcp'] = {}
+if 'servers' not in data['mcp']:
+    data['mcp']['servers'] = {}
+# OpenClaw format: mcp.servers.{name} is a NESTED object (not stringified)
+for name, server_cfg in setup_data.get('mcpServers', {}).items():
+    # Strip transport + timeouts (Hermes/Claude Desktop fields, not OpenClaw schema)
+    server_cfg_clean = {
+        'command': server_cfg.get('command'),
+        'args': server_cfg.get('args', []),
+        'env': server_cfg.get('env', {}),
+    }
+    data['mcp']['servers'][name] = server_cfg_clean
+with open(cfg, 'w') as f:
+    json.dump(data, f, indent=2)
+print('[duckbotos-computer-use] OpenClaw mcp.servers updated at ' + cfg)
+PYEOF
+        fi
+
+        # 9. Restart services to pick up the new MCP servers
+        if command -v systemctl >/dev/null 2>&1 && [ -n "$REAL_USER" ]; then
+            systemctl --user restart openclaw-gateway 2>/dev/null || true
+            systemctl --user restart hermes-gateway 2>/dev/null || true
+        fi
+
+        echo ""
+        echo "✅ Newest Desktop Control (Lobster Edition) installed at $NDC_DIR"
+        echo "   Service: systemctl status duckbotos-desktop-control"
+        echo "   MCP tools: 20+ (screenshot, mouse, keyboard, clipboard, apps, windows, files, Android)"
+        echo "   Hermes:  ~/hermes-config.json (mcp_servers.newest-desktop-control)"
+        echo "   OpenClaw: ~/.openclaw/openclaw.json (mcp.servers.newest-desktop-control)"
+        echo "   Optional: install duckbotos-cua-bridge for trycua/cua integration"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

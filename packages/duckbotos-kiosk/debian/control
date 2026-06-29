@@ -1,0 +1,33 @@
+Source: duckbotos-kiosk
+Section: x11
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+
+Package: duckbotos-kiosk
+Architecture: amd64 arm64
+Depends: weston (>= 13),
+         xwayland,
+         chromium-browser | chromium | google-chrome,
+         xdg-utils,
+         ${misc:Depends}
+Description: Weston kiosk shell + Chromium for DuckBotOS agent desktop
+ This package provides the fullscreen kiosk experience that makes
+ DuckBotOS an "agent-first OS."
+ .
+ What it does:
+ - Starts Weston as a Wayland compositor in kiosk mode
+ - Launches Chromium in fullscreen app mode (--kiosk --noerrdialogs)
+ - Points Chromium at the agent's web dashboard URL
+ - Handles display switching, idle timeout, power management
+ .
+ The URL loaded depends on /etc/duckbotos/kiosk-mode (set by
+ duckbotos-kiosk-hermes, duckbotos-kiosk-openclaw, or
+ duckbotos-session-picker at boot time).
+ .
+ Users cannot exit the kiosk (no taskbar, no alt-tab, no desktop).
+ The only way out is via agent command or Ctrl+Alt+Backspace.
+ .
+ This is what makes DuckBotOS fundamentally different from a
+ "desktop with an agent app" — the agent IS the entire display.

@@ -1,0 +1,109 @@
+#!/bin/bash
+# postinst for duckbotos-cua-bridge
+# Installs trycua/cua and wires cua-driver into Hermes + OpenClaw MCP servers
+
+set -e
+
+case "$1" in
+    configure)
+        echo "[duckbotos-cua-bridge] Installing trycua/cua..."
+
+        # 1. Install Python packages
+        if command -v pip3 >/dev/null 2>&1; then
+            pip3 install --break-system-packages --quiet cua 2>&1 | tail -3 || true
+            pip3 install --break-system-packages --quiet cua-driver 2>&1 | tail -3 || true
+            pip3 install --break-system-packages --quiet cua-sandbox 2>&1 | tail -3 || true
+        fi
+
+        # 2. Install cua-driver binary
+        if command -v curl >/dev/null 2>&1; then
+            curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.sh | bash 2>&1 | tail -5 || true
+        fi
+
+        # 3. CLI wrappers
+        cat > /usr/local/bin/cua << 'CUAWRAP'
+#!/bin/bash
+exec python3 -m cua "$@"
+CUAWRAP
+        chmod +x /usr/local/bin/cua
+
+        REAL_USER=$(getent passwd | awk -F: '$3 >= 1000 {print $1; exit}')
+        REAL_HOME=$(getent passwd | awk -F: '$3 >= 1000 {print $6; exit')
+        [ -n "$REAL_USER" ] || REAL_USER=root
+        [ -n "$REAL_HOME" ] || REAL_HOME=/root
+
+        # 4. Wire into Hermes — mcp_servers.{name} = JSON-stringified inner config
+        HERMES_CFG="$REAL_HOME/hermes-config.json"
+        if [ -f "$HERMES_CFG" ]; then
+            chown "$REAL_USER:$REAL_USER" "$HERMES_CFG" 2>/dev/null || true
+            python3 - << 'PYEOF'
+import json
+cfg = '/Users/duckets/hermes-config.json'.replace('/Users/duckets', open('/tmp/real_home').read().strip() if __import__('os').path.exists('/tmp/real_home') else '/root')
+# Fall back to env-supplied home
+import os
+real_home = os.environ.get('REAL_HOME', '/root')
+real_user = os.environ.get('REAL_USER', 'root')
+cfg = f'{real_home}/hermes-config.json'
+inner = {
+    'command': 'cua-driver',
+    'args': ['mcp'],
+    'env': {},
+    'transport': 'stdio',
+    'startup_timeout_sec': 20,
+    'tool_timeout_sec': 60,
+}
+with open(cfg) as f:
+    data = json.load(f)
+if 'mcp_servers' not in data:
+    data['mcp_servers'] = {}
+data['mcp_servers']['cua-driver'] = json.dumps(inner)
+with open(cfg, 'w') as f:
+    json.dump(data, f, indent=2)
+os.chown(cfg, __import__('pwd').getpwnam(real_user).pw_uid, -1)
+print(f'[duckbotos-cua-bridge] Hermes mcp_servers updated at {cfg}')
+PYEOF
+        fi
+
+        # 5. Wire into OpenClaw — mcp.servers.{name} nested under "mcp"
+        OPENCLAW_CFG="$REAL_HOME/.openclaw/openclaw.json"
+        mkdir -p "$REAL_HOME/.openclaw"
+        [ -f "$OPENCLAW_CFG" ] || echo '{}' > "$OPENCLAW_CFG"
+        chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.openclaw" 2>/dev/null || true
+        REAL_USER="$REAL_USER" REAL_HOME="$REAL_HOME" python3 - << 'PYEOF'
+import json, os, pwd
+real_user = os.environ['REAL_USER']
+real_home = os.environ['REAL_HOME']
+cfg = f'{real_home}/.openclaw/openclaw.json'
+inner = {
+    'command': 'cua-driver',
+    'args': ['mcp'],
+    'env': {},
+}
+with open(cfg) as f:
+    data = json.load(f)
+if 'mcp' not in data:
+    data['mcp'] = {}
+if 'servers' not in data['mcp']:
+    data['mcp']['servers'] = {}
+data['mcp']['servers']['cua-driver'] = inner
+with open(cfg, 'w') as f:
+    json.dump(data, f, indent=2)
+try:
+    os.chown(cfg, pwd.getpwnam(real_user).pw_uid, -1)
+except Exception:
+    pass
+print(f'[duckbotos-cua-bridge] OpenClaw mcp.servers updated at {cfg}')
+PYEOF
+
+        echo ""
+        echo "✅ trycua/cua installed"
+        echo "   CLI: cua, cua-driver mcp"
+        echo "   VM orchestration: cua-sandbox"
+        echo "   Computer-use backend: cua-driver"
+        echo "   Reference: https://github.com/trycua/cua"
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    *)
+        ;;
+esac

@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install LM Studio API service
+	mkdir -p debian/duckbotos-lm-studio/lib/systemd/system
+	cp debian/lm-studio-api.service debian/duckbotos-lm-studio/lib/systemd/system/

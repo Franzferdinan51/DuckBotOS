@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+case "$1" in
+    remove|purge)
+        pip3 uninstall --break-system-packages -y cua cua-driver cua-sandbox 2>/dev/null || true
+        rm -f /usr/local/bin/cua
+        rm -f /usr/local/bin/cua-driver
+        echo "[duckbotos-cua-bridge] Removed"
+        ;;
+    upgrade|failed-upgrade|abort-install|abort-upgrade)
+        ;;
+    *)
+        ;;
+esac

@@ -1,0 +1,18 @@
+
+   ____             ____        _       ____  ____
+  |  _ \ _   _ ___|  _ \  __ _| |_ ___|  _ \/ ___|
+  | | | | | | / __| | | |/ _` | __/ _ \ |_) \___ \
+  | |_| | |_| \__ \ |_| | (_| | ||  __/  __/ ___) |
+  |____/ \__,_|___/____/ \__,_|\__\___|_|   |____/
+                AI-first desktop OS — Hermes + OpenClaw
+
+Welcome to DuckBotOS v0.1.0.
+
+Common commands:
+  systemctl status duckbotos-kiosk       # check kiosk service
+  systemctl status duckbotos-lm-studio-api  # check LM Studio
+  systemctl status duckbotos-desktop-control  # check Newest Desktop Control
+  cat /etc/duckbotos/kiosk-mode          # current kiosk URL
+  duckbotos-brain-mcp --help             # brain MCP server
+
+Docs: https://github.com/Franzferdinan51/DuckBotOS

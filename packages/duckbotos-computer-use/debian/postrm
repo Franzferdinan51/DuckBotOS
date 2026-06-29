@@ -1,0 +1,19 @@
+#!/bin/bash
+# postrm for duckbotos-computer-use
+
+set -e
+
+case "$1" in
+    remove|purge)
+        systemctl stop duckbotos-desktop-control.service 2>/dev/null || true
+        systemctl disable duckbotos-desktop-control.service 2>/dev/null || true
+        rm -f /etc/systemd/system/duckbotos-desktop-control.service
+        systemctl daemon-reload 2>/dev/null || true
+        rm -rf /opt/duckbotos/desktop-control
+        echo "[duckbotos-computer-use] Removed. Source data at /opt/duckbotos/desktop-control is purged."
+        ;;
+    upgrade|failed-upgrade|abort-install|abort-upgrade)
+        ;;
+    *)
+        ;;
+esac

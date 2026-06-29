@@ -1,0 +1,15 @@
+duckbotos-browseros (0.1.0) stable; urgency=medium
+
+  * Initial DuckBotOS release.
+    - Ubuntu 24.04 Noble base
+    - Hermes v0.17 "Reach" agent mode
+    - OpenClaw gateway + duckbot-memory brain plugin
+    - DuckBot RAG brain (4-tier CoALA memory, MCP tools)
+    - LM Studio headless server (localhost:1234)
+    - BrowserOS as default browser
+    - Weston + Chromium kiosk (fullscreen agent desktop)
+    - Session picker for Hermes/OpenClaw/Hybrid mode selection
+    - NVIDIA GPU support (CUDA acceleration)
+    - DuckBot RAG brain with FSRS spaced repetition
+
+ -- DuckBotOS Team <duckets@duckbotos.dev>  Mon, 29 Jun 2026 17:00:00 +0000

@@ -1,0 +1,32 @@
+Source: duckbotos-brain
+Section: ai
+Priority: optional
+Maintainer: DuckBotOS Team <duckets@duckbotos.dev>
+Build-Depends: debhelper-compat (= 13), git
+Standards-Version: 4.6.2
+
+Package: duckbotos-brain
+Architecture: amd64 arm64
+Depends: python3.12, python3.12-venv, git, curl,
+         ${misc:Depends}
+Description: DuckBotOS AI brain — 4-tier RAG memory system for Hermes and OpenClaw
+ Installs the DuckBot RAG + Memory System as a pre-configured default
+ package in DuckBotOS. Provides:
+ .
+   • 4-tier CoALA memory: working, episodic, semantic, procedural
+   • Hybrid retrieval: vector + BM25 + Reciprocal Rank Fusion
+   • Entity graph with bi-temporal edges
+   • FSRS-6 spaced repetition with self-tuning forgetting curve
+   • Wing/Room/Drawer 2D memory palace (MemPalace-inspired)
+   • AAAK corpus indexing (scan thousands of memories in <500 tokens)
+   • Agent-driven skill pipeline → agentskills.io SKILL.md
+   • MCP stdio server: 67 memory tools for OpenClaw and Hermes
+ .
+ Installed to: /opt/duckbotos/brain/
+ MCP server started on-demand by the OpenClaw/Hermes MCP plugin.
+ Embedding backend: LM Studio (local, zero API cost) — pre-configured
+ with DuckBotOS defaults. Can override via /etc/duckbotos/brain.env.
+ .
+ This package is installed in ALL DuckBotOS modes (Hermes, OpenClaw, Both).
+ LM Studio must be running for local embeddings; falls back to OpenAI
+-compatible API endpoints.
