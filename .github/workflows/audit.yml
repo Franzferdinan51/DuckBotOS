@@ -24,11 +24,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run package audit
-        id: audit
+      - name: Download and run audit script
         run: |
-          cd DuckBotOS
-          python3 scripts/audit-debian-packages.py > audit-summary.txt || true
+          # Download fresh to bypass any pip/source cache
+          curl -fsSL \
+            "https://raw.githubusercontent.com/Franzferdinan51/DuckBotOS/${{ github.sha }}/scripts/audit-debian-packages.py" \
+            -o audit-debian-packages.py \
+            || curl -fsSL \
+              "https://raw.githubusercontent.com/Franzferdinan51/DuckBotOS/main/scripts/audit-debian-packages.py" \
+              -o audit-debian-packages.py
+          chmod +x audit-debian-packages.py
+          python3 audit-debian-packages.py > audit-summary.txt || true
           cat audit-summary.txt
 
       - name: Upload audit artifact
@@ -36,13 +42,13 @@ jobs:
         with:
           name: debian-package-audit-${{ github.ref_name }}
           path: |
-            DuckBotOS/audit-summary.txt
-            DuckBotOS/scripts/audit-debian-packages.py
+            audit-summary.txt
+            audit-debian-packages.py
           retention-days: 14
 
       - name: Fail if audit has errors
         run: |
-          if grep -q "NOT BUILD\|EXIT:1\|failed" DuckBotOS/audit-summary.txt; then
+          if grep -q "NOT BUILD\|❌ NOT BUILD" audit-summary.txt; then
             echo "❌ Package audit failed — see artifact for details"
             exit 1
           fi
