@@ -1,6 +1,6 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 00:10 EDT
+> Last updated: 2026-06-29 04:59 EDT
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -129,6 +129,13 @@
 
 ---
 
+## 🟢 PHASE 8 — Build Documentation
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| P8-1 | `docs/build-guide.md` — Fork → VM → packages → ISO build | ✅ Done | 2026-06-29 04:59 — 17.7KB, full step-by-step from fork to ISO |
+| P8-2 | `docs/system-boot-flow.md` — Complete boot sequence | ✅ Done | 2026-06-29 04:35 — 8.7KB, service order, ports, failure handling |
+
 ## 🟢 PHASE 10 — Polish & Release
 
 | # | Task | Status | Notes |
@@ -230,6 +237,41 @@
 
 ### Phase 5 Status (2026-06-29 02:30 EDT)
 **ALL PHASE 5 DOCS COMPLETE** — P5-1 through P5-14 all marked ✅ Done
+
+### Phase 8 Status (2026-06-29 04:59 EDT)
+**Phase 8 docs complete** — P8-1 build-guide.md (17.7KB, full fork-to-ISO guide) + P8-2 system-boot-flow.md (8.7KB, complete boot sequence) written and pushed.
+
+### Research Findings (2026-06-29 04:59 EDT) — Additional
+
+**LM Studio headless (llmster) — confirmed from lmstudio.ai/docs/developer/core/headless:**
+- Official install: `curl -fsSL https://lmstudio.ai/install.sh | bash` (Linux/macOS) — installs to `~/.lmstudio/bin/lms` + `~/.lmstudio/bin/llmster`
+- Daemon: `lms daemon up` — starts llmster as background daemon, `--json` for scripted output
+- llmster NOT the desktop app: no Electron, no GUI, server-native only
+- Systemd service: Type=oneshot with RemainAfterExit=yes — daemon stays up, `ExecStartPre` loads model, `ExecStart` starts server, `ExecStop` shuts down
+- Binary path: `~/.lmstudio/bin/lms` and `~/.lmstudio/bin/llmster`
+- JIT loading: ON by default — `/v1/models` returns all downloaded models; inference auto-loads if not in memory
+- When OFF: `/v1/models` returns only loaded models; must call `POST /v1/models/{id}/load` first
+- **Critical for ISO**: The install script is a simple curl|bash — can be called in package postinst. Binary staging in `/opt/lmstudio/` is NOT needed (install script handles it)
+
+**BrowserOS Linux — confirmed from github.com/browseros-ai/BrowserOS:**
+- **Linux .deb**: `https://cdn.browseros.com/download/BrowserOS.deb` (also `browseros-linux-amd64.deb` on GitHub releases)
+- **Linux AppImage**: `https://files.browseros.com/download/BrowserOS.AppImage`
+- **Linux CLI**: `curl -fsSL https://cdn.browseros.com/cli/install.sh | bash`
+- **Monorepo structure**: `packages/browseros/` (Chromium fork + build) + `packages/browseros-agent/apps/server/` (Bun MCP server, 53+ tools)
+- **Agent Mode recommendation**: Claude Opus 4.5 only; local models "not yet powerful enough"
+- **Chat Mode**: Any model works, including LM Studio
+- **BrowserOS vs OpenClaw comparison doc**: `https://docs.browseros.com/comparisons/openclaw`
+- **Linux install in ISO postinst**: `curl -fsSL https://cdn.browseros.com/download/BrowserOS.deb -o /tmp/browseros.deb && dpkg -i /tmp/browseros.deb`
+- **Default browser setup**: `update-alternatives --install /usr/bin/x-www-browser browseros /opt/browseros/browseros 200`
+
+**cx-distro confirmed directory structure (from README):**
+- `iso/live-build/` IS committed to git (contrary to earlier notes) — contains versioned live-build config
+- `iso/preseed/` — preseed files for Debian installer (DuckBotOS uses Subiquity autoinstall instead)
+- cx-distro is Debian-based (Trixie), not Ubuntu — DuckBotOS fork must change to Ubuntu Noble in Makefile
+- cx-distro README has complete directory tree + build instructions — reference for the fork
+- **cx-terminal**: Lives in `cxlinux-ai/cx-core` (separate repo), NOT in cx-distro. cx-distro only declares it as a dependency
+
+### Phase 2 Still Blocked
 **Phase 2 now the active blocker** — needs Linux VM + GitHub fork action from Duckets
 
 
