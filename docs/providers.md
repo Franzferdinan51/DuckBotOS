@@ -475,4 +475,17 @@ Planned additions:
 
 ---
 
-*Providers v0.1 — 2026-06-29. Provider matrix covers all confirmed Hermes + OpenClaw backends.*
+## 14. Related Documentation
+
+| Doc | What It Covers |
+|-----|---------------|
+| `docs/lm-studio.md` | Full llmster headless install, systemd service, JIT loading, model management, debian packaging, API endpoint reference |
+| `docs/architecture.md` §6 | LM Studio in the kiosk stack: provider config, model selection UI, OS-level integration |
+| `docs/architecture.md` §12 | Unified provider config: full `providers.yaml` with priority chain and task defaults |
+| `docs/installer.md` §4 | First-boot wizard: provider step (Step 3/5: Cloud Providers) and LM Studio step (Step 2/5) |
+| `docs/phase7-implementation.md` | How agents actually route between providers using complexity scoring — the decision logic behind the priority chain |
+| `docs/computer-use.md` | computer-use-linux MCP server — not a language model provider, but a desktop control provider the agent uses |
+
+---
+
+*Providers v0.2 — 2026-06-29. All providers confirmed from Hermes + OpenClaw source configs.*

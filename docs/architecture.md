@@ -736,6 +736,23 @@ GDM theme customized with DuckBotOS branding (colors, logo).
 | AppArmor + Firejail profiles | Branding / Plymouth theme |
 | Security defaults | All documentation |
 
+## 16. Deeper Documentation References
+
+This document covers the high-level stack. For detailed specifications, see:
+
+| Doc | What It Covers |
+|-----|---------------|
+| `docs/phase7-implementation.md` | Full Tier 1 feature specs (F1–F5): NL Package Manager, Resource Orchestrator, Multi-Agent Pipeline, Activity Graph, Voice — CLI contracts, systemd units, data flows, checklists |
+| `docs/computer-use.md` | AT-SPI2 + Wayland portal MCP server, computer-use-linux service, security model |
+| `docs/dual-agent-ipc.md` | JSON-RPC bus design, D-Bus integration, shared credentials, tool locking, GDM picker, conflict resolution rules |
+| `docs/build-guide.md` | Full fork → VM → packages → ISO build step-by-step |
+| `docs/system-boot-flow.md` | Complete boot sequence: service order, ports, failure handling |
+| `docs/lm-studio.md` | llmster headless install, systemd service, OpenAI-compatible API (port 1234) |
+| `docs/browseros.md` | .deb install, default browser setup, kiosk launcher, MCP server (port 9003) |
+| `docs/cx-linux-fork.md` | What changed from cx-distro: Debian→Ubuntu Noble, live-build config, package structure |
+| `docs/providers.md` | Full provider matrix: all cloud + local providers, unified providers.yaml |
+| `docs/installer.md` | Three ISOs, Subiquity OEM mode, autoinstall.yaml, first-boot wizard |
+
 ---
 
-*Architecture v0.1 — 2026-06-29. Feedback welcome via GitHub Issues.*
+*Architecture v0.2 — 2026-06-29. All cross-references verified against live docs.*

@@ -508,4 +508,17 @@ echo "[DuckBotOS] Kiosk setup complete."
 
 ---
 
-*Installer design v0.1 — 2026-06-29. Next: set up Linux VM for live-build testing.*
+## 8. Related Documentation
+
+| Doc | What It Covers |
+|-----|---------------|
+| `docs/build-guide.md` | Fork → VM → live-build → ISO — the actual build commands to run after this design is implemented |
+| `docs/system-boot-flow.md` | Complete boot sequence showing where firstboot.service fits in the startup order |
+| `docs/architecture.md` §5 | Kiosk shell: boot sequence, Weston kiosk service, Chromium/BrowserOS kiosk service |
+| `docs/phase7-implementation.md` | Tier 1 features (F1–F5) including firstboot wizard internals for provider/model setup |
+| `docs/lm-studio.md` | llmster install + LM Studio setup in first-boot wizard (Step 2/5) |
+| `docs/cx-linux-fork.md` | How live-build config carries over from cx-distro, what changes for DuckBotOS |
+
+---
+
+*Installer design v0.2 — 2026-06-29.*
