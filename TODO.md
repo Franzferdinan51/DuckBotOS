@@ -1,6 +1,6 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 18:00 EDT — v0.2.4: cx-distro fork merged, 15 complete packages, build-iso.yml fixed, User=%h fix
+> Last updated: 2026-06-29 19:00 EDT — v0.2.5: Soul.md added, CI/CD workflows fixed, cx-distro workflows added
 > Audit: run `python3 scripts/audit-debian-packages.py` from DuckBotOS root
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
@@ -152,19 +152,29 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P11-1 | DuckBotOS → cx-distro sync CI | ⏳ Pending | Auto-PR when DuckBotOS main changes cx-distro files |
-| P11-2 | cx-distro → DuckBotOS mirror sync | ⏳ Pending | Pull cx-distro duckbotos-branch changes back into DuckBotOS/cx-distro |
-| P11-3 | Package signing (GPG key setup) | ⏳ Pending | Sign .deb packages before release |
-| P11-4 | Release.yml — auto-tag + release on version bump | ⏳ Pending | |
+| P11-1 | DuckBotOS `audit.yml` | ✅ DONE — Runs on push/PR to main+duckbotos, audits cx-distro packages |
+| P11-2 | DuckBotOS `sync-to-cxdistro.yml` | ✅ DONE — Auto-syncs packages/scripts → cx-distro fork on push to main |
+| P11-3 | cx-distro `audit.yml` | ✅ DONE — Runs on push/PR to duckbotos |
+| P11-4 | cx-distro `sync-to-duckbotos.yml` | ✅ DONE — Mirrors packages from cx-distro → DuckBotOS main |
+| P11-5 | cx-distro `release.yml` | ✅ DONE — Creates GitHub Release on version tag push |
+| P11-6 | Package signing (GPG key setup) | ⏳ Pending | Sign .deb packages before release |
 
 ## 🟢 PHASE 12 — DuckBotOS ↔ cx-distro Relationship
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P12-1 | Document DuckBotOS/cx-distro architecture | ✅ DONE — README.md architecture section + HANDOFF.md | |
-| P12-2 | Remove stale stub packages from DuckBotOS | ✅ DONE — 7 stubs replaced with 15 complete packages from cx-distro (2026-06-29) | |
-| P12-3 | CLAUDE.md in DuckBotOS root explaining two-repo structure | ⏳ Pending | For Claude/agent context when working in repo |
-| P12-4 | CLAUDE.md in cx-distro root | ⏳ Pending | |
+| P12-1 | Document two-repo architecture | ✅ DONE — README.md architecture section + CLAUDE.md |
+| P12-2 | Remove stale stubs, merge 15 packages | ✅ DONE — 7 stubs replaced, 8 new added |
+| P12-3 | CLAUDE.md (DuckBotOS root) | ✅ DONE — Explains two-repo structure, key commands |
+| P12-4 | CLAUDE.md (cx-distro root) | ⏳ Pending — Update cx-distro CLAUDE.md for DuckBotOS context |
+
+## 🟡 PHASE 13 — OpenClaw Alignment
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| P13-1 | `SOUL.md` (DuckBotOS root) | ✅ DONE — Agent personality, principles, current context |
+| P13-2 | OpenClaw sync: DuckBotOS ↔ openclaw/openclaw | ⏳ Pending — Track upstream openclaw changes |
+| P13-3 | duckbotos-* packages aligned to openclaw conventions | ⏳ Pending |
 
 ---
 

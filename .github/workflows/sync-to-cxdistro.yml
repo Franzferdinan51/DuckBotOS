@@ -1,0 +1,71 @@
+name: Sync to cx-distro
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'scripts/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync packages → cx-distro
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DuckBotOS
+        uses: actions/checkout@v4
+
+      - name: Clone cx-distro fork
+        run: |
+          git clone --depth=1 https://github.com/Franzferdinan51/cx-distro.git -b duckbotos cx-distro-target
+
+      - name: Sync and push
+        id: sync
+        run: |
+          set -e
+          set -o pipefail
+
+          echo "=== Syncing packages/ → cx-distro ==="
+          rsync -av --delete \
+            DuckBotOS/packages/ \
+            cx-distro-target/packages/
+
+          echo "=== Syncing scripts/ → cx-distro ==="
+          rsync -av --delete \
+            DuckBotOS/scripts/ \
+            cx-distro-target/scripts/
+
+          echo "=== Committing changes ==="
+          cd cx-distro-target
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No relevant changes — nothing to sync"
+            echo "result=no_changes" >> $GITHUB_OUTPUT
+          else
+            git -c user.name="github-actions[bot]" \
+                -c user.email="github-actions[bot]@users.noreply.github.com" \
+                commit -m "🔄 Auto-sync: packages/scripts from DuckBotOS/main"
+            git push origin duckbotos
+            echo "✅ Pushed to cx-distro/duckbotos"
+            echo "result=pushed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Open sync PR
+        if: steps.sync.outputs.result == 'pushed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = await github.rest.pulls.create({
+              title: '🔄 Auto-sync from DuckBotOS/main',
+              head: 'duckbotos',
+              base: 'main',
+              body: '**Auto-generated PR** — DuckBotOS/main synced to cx-distro.\n\nChanges from `packages/` and/or `scripts/` synced automatically.',
+              repo: 'cx-distro',
+              owner: 'Franzferdinan51'
+            });
+            console.log('PR created:', result.data.html_url);

@@ -179,3 +179,27 @@ cx-distro fork (Franzferdinan51/cx-distro, duckbotos branch) cloned into DuckBot
 Audit result: 15 source packages, 18 binary packages, 0 failures, 0 collisions, 0 violations ✅
 
 **Next step**: Push to main/duckbotos → GitHub Actions runs `build-iso.yml` → surfaces real `dpkg-buildpackage` errors.
+
+---
+
+## ✅ RESOLVED — v0.2.5 (2026-06-29 19:00 EDT)
+
+### Soul.md — DuckBotOS Agent Personality
+- `DuckBotOS/SOUL.md` created — self-evolving agent personality file
+- Inspired by openclaw's self-evolving SOUL.md concept (openclaw/openclaw#88397, openclaw/openclaw#95790)
+- Layers: Immutable Soul, Workspace Soul, Adaptive Memory
+- Key rules captured: systemd `User=%h`, audit before commit, GitHub Actions `steps.X.outputs` limitations
+
+### CI/CD Workflows Fixed/Added
+| Workflow | Status | Fix |
+|----------|--------|-----|
+| DuckBotOS `audit.yml` | ✅ Created | Runs on every push/PR to main+duckbotos |
+| DuckBotOS `sync-to-cxdistro.yml` | ✅ Fixed | YAML error fixed (`if: steps.X.outputs` → single bash step with GITHUB_OUTPUT) |
+| cx-distro `audit.yml` | ✅ Created | Self-audit on push/PR to duckbotos |
+| cx-distro `sync-to-duckbotos.yml` | ✅ Created | Mirrors packages back to DuckBotOS main |
+| cx-distro `release.yml` | ✅ Created | Auto-releases on `v*` tag push |
+
+### Phase 11/12/13 TODO Entries
+- Phase 11 (CI/CD): 5/6 done, P11-6 GPG signing pending
+- Phase 12 (Two-repo): 3/4 done, cx-distro CLAUDE.md update pending
+- Phase 13 (OpenClaw): 1/3 done, upstream sync + package alignment pending

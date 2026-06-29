@@ -1,0 +1,49 @@
+name: Audit Debian Packages
+
+on:
+  push:
+    branches: [main, duckbotos]
+  pull_request:
+    branches: [main, duckbotos]
+
+jobs:
+  audit:
+    name: Audit packages (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout DuckBotOS
+        uses: actions/checkout@v4
+
+      - name: Clone cx-distro build pipeline
+        run: |
+          git clone --depth=1 https://github.com/Franzferdinan51/cx-distro.git -b duckbotos cx-distro
+          echo "cx-distro cloned: $(ls cx-distro/packages/ | wc -l) packages"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run package audit
+        id: audit
+        run: |
+          cd DuckBotOS
+          python3 scripts/audit-debian-packages.py > audit-summary.txt || true
+          cat audit-summary.txt
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-package-audit-${{ github.ref_name }}
+          path: |
+            DuckBotOS/audit-summary.txt
+            DuckBotOS/scripts/audit-debian-packages.py
+          retention-days: 14
+
+      - name: Fail if audit has errors
+        run: |
+          if grep -q "NOT BUILD\|EXIT:1\|failed" DuckBotOS/audit-summary.txt; then
+            echo "❌ Package audit failed — see artifact for details"
+            exit 1
+          fi
+          echo "✅ All packages passed audit"
