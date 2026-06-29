@@ -1,0 +1,38 @@
+Source: duckbotos-lm-studio
+Section: admin
+Priority: optional
+Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
+Rules-Requires-Root: no
+
+Package: duckbotos-lm-studio
+Architecture: all
+Depends: ${misc:Depends},
+ curl,
+ systemd
+Pre-Depends: bash (>= 4.0)
+Description: DuckBotOS LM Studio — first-class local model provider
+ Installs LM Studio as a first-class local model provider for DuckBotOS.
+ LM Studio provides an OpenAI-compatible REST API on port 1234 for
+ local LLM inference with GPU acceleration (CUDA/ROCm when available).
+ .
+ Installed path: ~/.lmstudio/ (user home, no root required)
+ Binary: ~/.lmstudio/bin/llmster (headless server)
+ CLI:      ~/.lmstudio/bin/lms      (model management)
+ API:      http://127.0.0.1:1234/v1  (OpenAI-compatible)
+ .
+ JIT model loading is enabled by default — models are loaded on first
+ inference request and stay in memory until unloaded or system restart.
+ .
+ Systemd unit: lmstudio.service (user-level, started on login)
+ Config:     ~/.lmstudio/lmstudio.json
+ Models dir: ~/.lmstudio/models/
+ .
+ GPU memory limits are set via /etc/security/limits.d/lmstudio.conf
+ to allow larger context models to stay loaded in memory.
+ .
+ Port: 1234 (localhost only, no remote access by default)

@@ -1,0 +1,41 @@
+Source: duckbotos-computer-use
+Section: admin
+Priority: optional
+Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
+Rules-Requires-Root: no
+
+Package: duckbotos-computer-use
+Architecture: all
+Depends: ${misc:Depends},
+ python3,
+ python3-pip,
+ at-spi2-core,
+ libatspi2.0-0,
+gir1.2-atspi-2.0,
+ libwayland-client0,
+ libwayland-cursor0,
+ xdg-desktop-portal-wlr,
+ wlrb,
+ python3-yaml,
+ python3-typing-extensions
+Description: DuckBotOS computer-use — desktop automation MCP server
+ Installs computer-use-linux as a systemd-per-user MCP server for
+ automated desktop interaction and accessibility-driven control.
+ .
+ AT-SPI2 accessibility bus integration for reading UI elements.
+ Wayland portal for screen capture and input events.
+ MCP protocol server exposing desktop automation to Hermes/OpenClaw.
+ .
+ Per-user systemd service: computer-use@username.service
+ Config: ~/.config/computer-use-linux.yaml
+ Socket: ~/.computer-use/computer-use.sock (user-owned Unix socket)
+ MCP:    http://127.0.0.1:18765/mcp (localhost only)
+ .
+ Requires Wayland session (Weston kiosk in DuckBotOS).
+ Not compatible with X11-only sessions.
+ Requires active user session with accessibility bus running.

@@ -1,0 +1,37 @@
+Source: duckbotos-browseros
+Section: web
+Priority: optional
+Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
+Rules-Requires-Root: no
+
+Package: duckbotos-browseros
+Architecture: all
+Depends: ${misc:Depends},
+ curl,
+ desktop-file-utils,
+ xdg-utils
+Description: DuckBotOS BrowserOS — default agentic web browser
+ Installs BrowserOS as the default agentic web browser for DuckBotOS.
+ BrowserOS is a Chromium fork with native AI agent support, providing
+ 53+ browser automation tools via MCP protocol.
+ .
+ CLI:      /usr/bin/browseros-cli
+ Binary:   /opt/browseros/browseros
+ MCP port: 9003 (localhost)
+ .
+ Set as default browser via update-alternatives:
+   update-alternatives --install /usr/bin/x-www-browser browseros \
+     /opt/browseros/browseros 200
+ .
+ Registered as x-www-browser for OS-wide use.
+ Agent mode supports Claude Opus 4.5 and any OpenAI-compatible model.
+ Chat mode supports any model including local LM Studio models.
+ .
+ NOTE: browseros-cli `status` is known to report "disconnected" even
+ when working — use `browseros-cli health` and `browseros-cli pages`
+ to verify real state.
