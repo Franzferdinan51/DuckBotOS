@@ -73,7 +73,7 @@ The brain is wired into **every install mode** — Hermes, OpenClaw, and Both. I
 
 > **"Identity, not a feature."** — the brain is part of what makes DuckBotOS *DuckBotOS*. Without it, the agent is a chat sidebar. With it, the agent has continuity.
 
-Docs: [docs/lm-studio.md](docs/lm-studio.md) | Source: [duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory)
+Docs: [docs/desktop-control.md](docs/desktop-control.md) • [docs/lm-studio.md](docs/lm-studio.md) | Source: [duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory)
 
 ---
 
@@ -101,7 +101,7 @@ Full list: [docs/features.md](docs/features.md)
 | 📦 Packages (13/13 with debian/control + debian/rules + debian/changelog) | ✅ Complete |
 | 🧠 **DuckBot brain** (duckbot-rag-memory, 67 MCP tools, FSRS, skill pipeline) | ✅ **Ships by default in all modes** — wired via OpenClaw plugin |
 | 🔧 All service files (hermes, openclaw, lm-studio, desktop-control, cua-driver, brain, kiosk, session-picker) | ✅ Written |
-| 🖱️ Newest Desktop Control (Lobster Edition) + trycua/cua bridge | ✅ **Newest Desktop Control rewrites computer-use package** — replaces agent-sh with Duckets' local tool |
+| 🖱️ Newest Desktop Control (Lobster Edition) + trycua/cua bridge | ✅ **Newest Desktop Control rewrites computer-use package** — replaces agent-sh with Duckets' local tool. See [docs/desktop-control.md](docs/desktop-control.md) |
 | 🎨 Session picker UI for Both mode (8080) | ✅ Complete |
 | 🏗️ ISO build pipeline (cx-distro fork, Ubuntu 24.04 Noble) | ✅ Ready — `./src/build.sh` |
 | 🤖 GitHub Actions CI auto-builds ISO | ✅ Configured |
