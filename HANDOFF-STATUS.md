@@ -6,6 +6,8 @@
 
 - **Project**: Franzferdinan51/DuckBotOS
 - **Build pipeline**: Franzferdinan51/cx-distro (branch: duckbotos)
+- **Desktop control**: Franzferdinan51/desktop-control-lobster-edition-skill (MIT, 38 tests) — replaces agent-sh/computer-use-linux
+- **VM orchestration**: trycua/cua (MIT) — installed as optional `duckbotos-cua-bridge` package
 - **Branches synced**: ✅ both up to date with main
 - **Last commits**:
   - main: `ffa87d5` (README.md status snapshot)

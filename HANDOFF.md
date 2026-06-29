@@ -66,7 +66,8 @@ sudo apt update && sudo apt install -y \
 | `duckbotos-openclaw` | OpenClaw gateway at :18789 + brain plugin wired in | `debian/postinst` (git clone + npm install + brain plugin JSON) |
 | `duckbotos-lm-studio` | LM Studio API at :1234 | `debian/lm-studio-api.service` |
 | `duckbotos-browseros` | BrowserOS default browser | `debian/postinst` (sets xdg default) |
-| `duckbotos-computer-use` | AT-SPI2 + Wayland MCP server :9600 | `debian/computer-use-linux.service` |
+| `duckbotos-computer-use` | **Newest Desktop Control (Lobster Edition)** — Duckets' MIT desktop control MCP server, 38 tests, 20+ tools | `debian/postinst` (git clone + npm + Python deps + JSON patch into Hermes/OpenClaw) |
+| `duckbotos-cua-bridge` | **trycua/cua** — VM orchestration + alternative computer-use backend (optional) | `debian/postinst` (pip install + openclaw.json registration) |
 | `duckbotos-kiosk` | Weston + Chromium kiosk (the OS surface) | `debian/duckbotos-kiosk-launch.sh` |
 | `duckbotos-kiosk-hermes` | Pre-configures kiosk for Hermes :9119 | `debian/postinst` |
 | `duckbotos-session-picker` | Both-mode UI at :8080 | `session-picker.py` + `index.html` |

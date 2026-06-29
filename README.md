@@ -100,7 +100,8 @@ Full list: [docs/features.md](docs/features.md)
 | 📚 Docs (22 total) | ✅ Complete |
 | 📦 Packages (13/13 with debian/control + debian/rules + debian/changelog) | ✅ Complete |
 | 🧠 **DuckBot brain** (duckbot-rag-memory, 67 MCP tools, FSRS, skill pipeline) | ✅ **Ships by default in all modes** — wired via OpenClaw plugin |
-| 🔧 All service files (hermes, openclaw, lm-studio, computer-use, brain, kiosk, session-picker) | ✅ Written |
+| 🔧 All service files (hermes, openclaw, lm-studio, desktop-control, cua-driver, brain, kiosk, session-picker) | ✅ Written |
+| 🖱️ Newest Desktop Control (Lobster Edition) + trycua/cua bridge | ✅ **Newest Desktop Control rewrites computer-use package** — replaces agent-sh with Duckets' local tool |
 | 🎨 Session picker UI for Both mode (8080) | ✅ Complete |
 | 🏗️ ISO build pipeline (cx-distro fork, Ubuntu 24.04 Noble) | ✅ Ready — `./src/build.sh` |
 | 🤖 GitHub Actions CI auto-builds ISO | ✅ Configured |
@@ -119,7 +120,7 @@ The ISO build is the only remaining milestone. See [HANDOFF.md](HANDOFF.md) for 
 - **Agents:** Hermes (NousResearch) + OpenClaw
 - **Memory & brain:** `duckbot-rag-memory` (4-tier CoALA, 67 MCP tools, FSRS, OpenClaw plugin shim)
 - **Local LLM:** LM Studio headless (llmster daemon) at `localhost:1234`
-- **Desktop control:** `agent-sh/computer-use-linux` Rust MCP server
+- **Desktop control:** Duckets' Newest Desktop Control (Lobster Edition, MIT, 38 tests, 20+ tools) — wires into Hermes AND OpenClaw automatically. Optional trycua/cua bridge (`duckbotos-cua-bridge`) for VM orchestration and an alternative computer-use backend.
 - **Voice:** openWakeWord + Whisper.cpp (LM Studio bundled) + Piper TTS
 - **Activity graph:** netdata + custom `hermesos-graph` daemon
 
@@ -133,7 +134,8 @@ We inherit from:
 - [thesysdev/openclaw-os](https://github.com/thesysdev/openclaw-os) — OpenClaw web workspace
 - [nousresearch/hermes-agent](https://github.com/nousresearch/hermes-agent) — agent core + Web Dashboard
 - [Franzferdinan51/duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory) — **the brain (ships by default in all DuckBotOS modes)**
-- [agent-sh/computer-use-linux](https://github.com/agent-sh/computer-use-linux) — desktop control MCP
+- [Franzferdinan51/desktop-control-lobster-edition-skill](https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill) — **the desktop control MCP (Duckets' local tool, MIT, 38 tests)**
+- [trycua/cua](https://github.com/trycua/cua) — VM orchestration + optional Linux computer-use backend
 - [browseros-ai/BrowserOS](https://github.com/browseros-ai/BrowserOS) — default browser
 
 ---
@@ -144,4 +146,4 @@ Apache 2.0 + attribution to NousResearch (Hermes), OpenClaw team, cxlinux-ai, ag
 
 ---
 
-*Built by [Franzferdinan51/DuckBotOS](https://github.com/Franzferdinan51/DuckBotOS). For when an OS should be an intelligent butler that remembers, not a chat sidebar that forgets.*
+*Built by [Franzferdinan51/DuckBotOS](https://github.com/Franzferdinan51/DuckBotOS). For when an OS should be an intelligent butler that remembers, not a chat sidebar that forgets. Built on Duckets' own tools — desktop control, computer-use, and the brain all ship as first-class MIT-licensed components.*
