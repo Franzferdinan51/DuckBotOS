@@ -62,7 +62,8 @@ sudo apt update && sudo apt install -y \
 |---------|---------|----------|
 | `duckbotos-base` | Core OS: Python + Node + Weston | Essential |
 | `duckbotos-hermes` | Hermes v0.17 agent at :9119 | `debian/postinst` (git clone + pip install) |
-| `duckbotos-openclaw` | OpenClaw gateway at :18789 | `debian/postinst` (git clone + npm install) |
+| `duckbotos-brain` | **DuckBot RAG memory brain** — 4-tier CoALA, 67 MCP tools, FSRS, Wing/Room/Drawer palace | `debian/postinst` (git clone + venv + LM Studio config + plugin registration) |
+| `duckbotos-openclaw` | OpenClaw gateway at :18789 + brain plugin wired in | `debian/postinst` (git clone + npm install + brain plugin JSON) |
 | `duckbotos-lm-studio` | LM Studio API at :1234 | `debian/lm-studio-api.service` |
 | `duckbotos-browseros` | BrowserOS default browser | `debian/postinst` (sets xdg default) |
 | `duckbotos-computer-use` | AT-SPI2 + Wayland MCP server :9600 | `debian/computer-use-linux.service` |
@@ -128,8 +129,9 @@ duckbotos-kiosk-launch.sh:
 4. **Test the ISO** in UTM or real hardware:
    - Boot from ISO
    - Install DuckBotOS
-   - Verify services start: `systemctl status hermes-gateway`, `lm-studio-api`, etc.
+   - Verify services start: `systemctl --user status hermes-gateway`, `systemctl status lm-studio-api`, `systemctl --user status duckbotos-brain-watcher`
    - Verify kiosk loads the correct URL
+   - Verify brain: `openclaw plugins list | grep duckbot-memory`
 5. **Push fixes** to the `duckbotos` branch — CI auto-builds on every push
 
 ---
