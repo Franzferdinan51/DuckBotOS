@@ -1,0 +1,47 @@
+Source: duckbotos-base
+Section: admin
+Priority: optional
+Maintainer: DuckBotOS Team <team@duckbotos.ai>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Homepage: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Browser: https://github.com/Franzferdinan51/DuckBotOS
+Vcs-Git: https://github.com/Franzferdinan51/DuckBotOS.git
+Rules-Requires-Root: no
+
+Package: duckbotos-base
+Architecture: all
+Depends: ${misc:Depends},
+ ubuntu-desktop-minimal,
+ weston,
+ xdg-desktop-portal,
+ xdg-utils,
+ curl,
+ wget,
+ git,
+ htop,
+ tmux,
+ fish,
+ openssh-client,
+ ufw,
+ unattended-upgrades,
+ apparmor,
+ apparmor-utils,
+ firejail
+Description: DuckBotOS base system — Weston kiosk + shell utilities
+ Minimal base package for DuckBotOS. Installs Weston compositor
+ in kiosk mode, agent-facing shell utilities, and security tooling.
+ .
+ Does NOT include any AI/agent packages — those are in the
+ mode-specific packages (duckbotos-hermes, duckbotos-openclaw, etc.).
+ .
+ Installs:
+  - Weston compositor (kiosk/windowed modes)
+  - xdg-desktop-portal (Wayland portal for screen capture, file dialogs)
+  - fish shell (interactive shell for agents)
+  - tmux (terminal multiplexer for sub-agent sessions)
+  - firejail + AppArmor (security sandboxing)
+  - unattended-upgrades (automated security updates)
+  - ufw (uncomplicated firewall)
+ .
+ Port 5900: VNC for remote desktop access (disabled by default)
