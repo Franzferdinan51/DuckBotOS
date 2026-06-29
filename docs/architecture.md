@@ -11,7 +11,7 @@ DuckBotOS is **not** a general-purpose Linux distro with an AI app bolted on. It
 
 The core insight: both Hermes and OpenClaw already ship web-based frontends. We don't build a custom desktop shell; we build:
 1. A kiosk-mode Wayland session that auto-loads the agent's web URL
-2. systemd services for both gateways + `computer-use-linux` MCP server
+2. systemd services for both gateways + `Newest Desktop Control` MCP server
 3. An installer that lets users pick which agent(s) to install
 4. A login-screen session picker for "Both" mode
 
@@ -27,7 +27,7 @@ DuckBotOS is built by forking and extending existing projects rather than starti
 | **cxlinux-ai/cx-core** | Meta-package pattern (minimal install). Reference only. | BSL 1.1 |
 | **thesysdev/openclaw-os** | OpenClaw web workspace at `/plugins/openclawos`. Becomes our "OpenClaw desktop." | TBD |
 | **nousresearch/hermes-agent** | Hermes Web Dashboard at `http://127.0.0.1:9119`. Agent core. | MIT |
-| **agent-sh/computer-use-linux** | Rust MCP server for AT-SPI2 + Wayland portal desktop control. Lets agents click/type/screenshot. | TBD |
+| **Newest Desktop Control (Lobster Edition)** | Rust MCP server for AT-SPI2 + Wayland portal desktop control. Lets agents click/type/screenshot. | TBD |
 | **lmstudio-ai/lm-studio** | Local LLM server. `llmster` daemon + REST API on port 1234. First-class provider. | Proprietary |
 | **browseros-ai/BrowserOS** | Chromium-based agentic browser. Default browser for kiosk. | AGPL v3 |
 | **Weston** (Wayland) | Kiosk compositor. Auto-starts on tty1, no login required. | MIT |
@@ -61,7 +61,7 @@ Ubuntu 24.04 LTS (Noble Numbat)
 ├── hermes-gateway.service          # systemd: hermes gateway on port 9119
 ├── weston-kiosk.service            # systemd: Weston compositor
 ├── chromium-kiosk.service          # systemd: Chromium kiosk → http://127.0.0.1:9119
-└── computer-use-linux.service      # systemd: MCP server on port 9600
+└── Newest Desktop Control.service      # systemd: MCP server on port 9600
 
 ~/.hermes/
 ├── workspace/                      # Skills, memory, sessions
@@ -78,11 +78,12 @@ Ubuntu 24.04 LTS (Noble Numbat)
 ├── openclaw-os/                    # Web workspace plugin (served at /plugins/openclawos)
 ├── weston-kiosk.service            # systemd: Weston compositor
 ├── chromium-kiosk.service          # systemd: Chromium → http://127.0.0.1:18789/plugins/openclawos
-└── computer-use-linux.service      # systemd: MCP server on port 9600
+└── Newest Desktop Control.service      # systemd: MCP server on port 9600
 
-/var/lib/openclaw/
-├── workspace/                      # Skills, memory, sessions
-└── config.yaml                     # Provider keys, model preferences
+~/.openclaw/
+├── openclaw.json                   # Config (plugins.entries + mcp.servers) — per src/config/paths.ts
+├── workspace/                      # Skills, memory, sessions (user-state)
+└── extensions/duckbot-memory/      # Brain plugin (installed by duckbotos-brain)
 ```
 
 ### 4.3 Both Mode (Hybrid)
@@ -115,7 +116,7 @@ The kiosk is the core UX surface. It replaces the display manager's user-facing 
   └─ multi-user.target
       ├─ hermes-gateway.service      (Hermes-only or Both)
       ├─ openclaw-gateway.service    (OpenClaw-only or Both)
-      ├─ computer-use-linux.service  (all modes) — MCP on port 9600
+      ├─ Newest Desktop Control.service  (all modes) — MCP on port 9600
       ├─ weston-kiosk.service        (all modes) — Wayland compositor
       └─ chromium-kiosk.service      (all modes) — fullscreen browser
 
@@ -348,20 +349,20 @@ mcp_servers:
 
 ---
 
-## 8. `computer-use-linux` Integration
+## 8. `Newest Desktop Control` Integration
 
-`computer-use-linux` is a Rust MCP server that gives the agent full desktop control via AT-SPI2 (accessibility bus) and Wayland portals. This is the bridge that lets agents click buttons, type text, read screen content, and manage windows.
+`Newest Desktop Control` is a Rust MCP server that gives the agent full desktop control via AT-SPI2 (accessibility bus) and Wayland portals. This is the bridge that lets agents click buttons, type text, read screen content, and manage windows.
 
-**Repo:** https://github.com/agent-sh/computer-use-linux
+**Repo:** https://github.com/Newest Desktop Control (Lobster Edition)
 
 ```ini
-# /etc/systemd/system/computer-use-linux.service
+# /etc/systemd/system/Newest Desktop Control.service
 [Unit]
 Description=Computer Use Linux MCP Server
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/computer-use-linux --port 9600
+ExecStart=/usr/local/bin/Newest Desktop Control --port 9600
 Restart=always
 RestartSec=10
 User=root
@@ -388,7 +389,7 @@ When both Hermes and OpenClaw are installed (Both mode), they communicate via a 
 [Hermes Gateway]  ←→  agent-bus.sock  ←→  [OpenClaw Gateway]
                            ↑
                            ↓
-              [computer-use-linux MCP on port 9600]
+              [Newest Desktop Control MCP on port 9600]
 ```
 
 **IPC calls available:**
@@ -432,7 +433,7 @@ duckbotos/
 │   │       │       ├── openclawos-meta/
 │   │       │       ├── hermesos-hybrid-meta/
 │   │       │       ├── hermesos-kiosk/
-│   │       │       ├── computer-use-linux/
+│   │       │       ├── Newest Desktop Control/
 │   │       │       ├── browseros/      # BrowserOS .deb
 │   │       │       └── lm-studio/      # llmster install
 │   │       └── hooks/
@@ -448,7 +449,7 @@ duckbotos/
 │   ├── openclawos-meta/          # OpenClaw-only meta-package
 │   ├── hermesos-hybrid-meta/     # Both-mode meta-package
 │   ├── hermesos-kiosk/           # Weston + Chromium/BrowserOS kiosk
-│   ├── computer-use-linux/       # MCP desktop control server
+│   ├── Newest Desktop Control/       # MCP desktop control server
 │   ├── browseros/                # BrowserOS .deb packaging
 │   └── lm-studio/                # llmster + systemd user service
 ├── repository/
@@ -473,7 +474,7 @@ CX Linux uses a Rust-based `cx-terminal` agent. DuckBotOS replaces this in the f
 1. **Remove** `packages/cx-terminal/` from the live-build config
 2. **Add** `packages/hermesos-meta/` with a `DEBIAN/control` that depends on:
    - `hermes-agent` (or `hermes` CLI from NousResearch)
-   - `computer-use-linux`
+   - `Newest Desktop Control`
    - `weston`, `chromium-browser` (or `browseros`)
 3. **Add** hook: `config/hooks/live/chroot-early/05-hermes-install.chroot` that:
    - Downloads and installs Hermes from official source
@@ -541,7 +542,7 @@ browseros
 hermesos-kiosk
 
 # Desktop control
-computer-use-linux
+Newest Desktop Control
 ```
 
 ---
@@ -606,7 +607,7 @@ After OS install, the first-boot wizard runs:
 3. **Default model** — pick from available LM Studio models or cloud defaults
 4. **Channel selection** — Telegram, CLI, etc.
 
-Configuration is written to `~/.hermes/config.yaml` or `/var/lib/openclaw/config.yaml`.
+Configuration is written to ``~/hermes-config.json` or `~/.openclaw/openclaw.json`.
 
 ---
 
@@ -710,7 +711,7 @@ GDM theme customized with DuckBotOS branding (colors, logo).
 
 ### 14.2 Credential Storage
 
-- API keys stored in `~/.hermes/config.yaml` / `/var/lib/openclaw/config.yaml`
+- API keys stored in ``~/hermes-config.json` / `~/.openclaw/openclaw.json`
 - Permissions: `chmod 600` on config files (user-only read)
 - **Future:** TPM-backed credential store (`/etc/hermes-claw/credentials/`)
 - LM Studio API key: optional Bearer auth on port 1234
@@ -719,7 +720,7 @@ GDM theme customized with DuckBotOS branding (colors, logo).
 
 - All cloud API traffic over HTTPS
 - LM Studio REST API bound to `127.0.0.1:1234` (localhost only) — not exposed
-- `computer-use-linux` MCP on port 9600 (localhost only)
+- `Newest Desktop Control` MCP on port 9600 (localhost only)
 - Firewall: default deny outbound, allow HTTPS (443) only for cloud APIs
 
 ---
@@ -743,7 +744,7 @@ This document covers the high-level stack. For detailed specifications, see:
 | Doc | What It Covers |
 |-----|---------------|
 | `docs/phase7-implementation.md` | Full Tier 1 feature specs (F1–F5): NL Package Manager, Resource Orchestrator, Multi-Agent Pipeline, Activity Graph, Voice — CLI contracts, systemd units, data flows, checklists |
-| `docs/computer-use.md` | AT-SPI2 + Wayland portal MCP server, computer-use-linux service, security model |
+| `docs/computer-use.md` | AT-SPI2 + Wayland portal MCP server, Newest Desktop Control service, security model |
 | `docs/dual-agent-ipc.md` | JSON-RPC bus design, D-Bus integration, shared credentials, tool locking, GDM picker, conflict resolution rules |
 | `docs/build-guide.md` | Full fork → VM → packages → ISO build step-by-step |
 | `docs/system-boot-flow.md` | Complete boot sequence: service order, ports, failure handling |

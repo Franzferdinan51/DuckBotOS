@@ -11,7 +11,7 @@ In **Both mode** (the Hybrid Workstation install), both Hermes and OpenClaw run 
 
 1. **Coordinate** — Agree on shared state (active provider, current model, API keys loaded)
 2. **Delegate** — Hermes can ask OpenClaw to verify/refine its work, and vice versa
-3. **Share tools** — `computer-use-linux` MCP server is shared with tool-level locking
+3. **Share tools** — `Newest Desktop Control` MCP server is shared with tool-level locking
 4. **Share credentials** — API keys stored once, accessible to both (TPM-backed when available)
 5. **Resolve conflicts** — If both agents want to do contradictory actions, resolve gracefully
 
@@ -29,7 +29,7 @@ Dual-Agent IPC Architecture (Both Mode)
 ├── agent-bus.sock          # JSON-RPC 2.0 Unix socket — main bus
 ├── hermes.sock             # Hermes gateway Unix socket (internal)
 ├── openclaw.sock           # OpenClaw gateway Unix socket (internal)
-├── computer-use.sock       # computer-use-linux tool lock socket
+├── computer-use.sock       # Newest Desktop Control tool lock socket
 └── credentials/            # Shared credential store (0600, owned by hermes-claw group)
 
 /etc/hermes-claw/
@@ -328,11 +328,11 @@ credential_policy:
 
 ---
 
-## 6. Tool Sharing — computer-use-linux
+## 6. Tool Sharing — Newest Desktop Control
 
 ### 6.1 The Problem
 
-Both Hermes and OpenClaw may want to use `computer-use-linux` simultaneously. If both agents click the same button at the same time, chaos ensues.
+Both Hermes and OpenClaw may want to use `Newest Desktop Control` simultaneously. If both agents click the same button at the same time, chaos ensues.
 
 ### 6.2 Solution: Tool-Level Locking via Agent Bus
 
@@ -413,19 +413,19 @@ case "$MODE" in
         systemctl start hermes-gateway.service
         systemctl start weston-kiosk.service
         systemctl start chromium-kiosk.service  # → --app=http://127.0.0.1:9119
-        systemctl start computer-use-linux.service
+        systemctl start Newest Desktop Control.service
         ;;
     openclaw)
         systemctl start openclaw-gateway.service
         systemctl start weston-kiosk.service
         systemctl start chromium-kiosk.service  # → --app=http://127.0.0.1:18789/plugins/openclawos
-        systemctl start computer-use-linux.service
+        systemctl start Newest Desktop Control.service
         ;;
     hybrid)
         systemctl start hermes-gateway.service
         systemctl start openclaw-gateway.service
         systemctl start hermes-claw-bus.service
-        systemctl start computer-use-linux.service
+        systemctl start Newest Desktop Control.service
         systemctl start gnome-session.service  # Full GNOME Shell with both agents
         ;;
 esac
@@ -441,7 +441,7 @@ For provider/model selection, the last agent to call `SetProvider` wins. Both ag
 
 ### 8.2 Rule: Locked Tools (for actions)
 
-`computer-use-linux` tool calls are serialized via locks. One agent acts at a time.
+`Newest Desktop Control` tool calls are serialized via locks. One agent acts at a time.
 
 ### 8.3 Rule: Explicit Delegation (for reasoning)
 

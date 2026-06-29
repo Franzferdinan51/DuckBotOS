@@ -1,6 +1,7 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 14:05 EDT (post-handoff final cleanup)
+> Last updated: 2026-06-29 15:30 EDT — v0.2.3 docs pass + audit-script coverage
+> Audit: run `python3 scripts/audit-debian-packages.py` to verify clean
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -25,9 +26,9 @@
 | P2-2 Fork cxlinux-ai/cx-distro on GitHub | ⏳ Pending — CAN START NOW (gh CLI, no VM needed) | Fork to Franzferdinan51 account, clone locally. | Fork to Franzferdinan51 account |
 | P2-3 | Replace `cx-terminal` (Rust) in fork with Hermes install script | ⏳ Pending | Swap cxlinux-ai cx-terminal for Hermes |
 | P2-4 | Add LM Studio .deb package to ISO | ⏳ Pending | Headless install research needed |
-| P2-5 | Add BrowserOS to ISO + set as default browser | ⏳ Pending | BrowserOS Linux install research needed |
-| P2-6 | Add `computer-use-linux` to ISO as system service | ⏳ Pending | AT-SPI2 + Wayland portal MCP |
-| P2-7 | Write `hermesos-meta` / `duckbotos-hermes` / `duckbotos-openclaw` / `duckbotos-hybrid` packages | ⏳ Pending | Meta-packages for install modes |
+| P2-5 | ✅ BrowserOS installed as default browser | DONE | `duckbotos-browseros` package — sets as default, configures xdg-mime |
+| P2-6 | ✅ Newest Desktop Control (Lobster Edition) installed as system service | DONE | `duckbotos-computer-use` — MIT, 38 tests, 20+ tools, replaces computer-use-linux |
+| P2-7 | ✅ Install mode meta-packages written | DONE | `duckbotos-mode-{hermes,openclaw,hybrid}` (v0.2.2 rename — was duckbotos-meta-*) |
 | P2-8 | Configure Weston kiosk + Chromium kiosk service | ⏳ Pending | Fullscreen dashboard loading |
 | P2-9 | First bootable Hermes-only ISO | ⏳ Pending | Verify boots to Hermes dashboard |
 
@@ -111,7 +112,7 @@
 |---|---------|--------|-------|
 | F6 | 🔒 Privacy Sentinel | ⏳ Pending | Outbound traffic monitor + intercept |
 | F7 | 💾 Semantic File Memory | ⏳ Pending | Full $HOME semantic index |
-| F8 | 🖱️ Accessibility API Control | ⏳ Pending | computer-use-linux integration |
+| F8 | 🖱️ Accessibility API Control | ⏳ Pending | Newest Desktop Control integration |
 | F9 | 🔥 Natural Language Firewall | ⏳ Pending | iptables/nftables via NL |
 | F10 | 🦆 Startup Storyteller | ⏳ Pending | Animated boot graph |
 
@@ -204,7 +205,7 @@ Remaining (needs Linux VM — automated via CI):
   ⏳ First ISO build (CI will surface errors, iterate from logs)
   ⏳ LM Studio binary install (config-only for now — needs actual binary)
   ⏳ BrowserOS binary install (default-only for now — needs actual binary)
-  ⏳ computer-use-linux binary (build from source or pre-built)
+  ⏳ Newest Desktop Control binary (build from source or pre-built)
   ⏳ Brain plugin ordering fix (workaround in HANDOFF.md)
 ```
 

@@ -37,9 +37,32 @@ Pick at install time:
 
 | Mode | Boots Into |
 |------|-----------|
-| **Hermes-only** | Hermes Web Dashboard + `computer-use-linux` for desktop control |
-| **OpenClaw-only** | openclaw-os plugin + same computer-use-linux bridge |
+| **Hermes-only** | Hermes Web Dashboard + `Newest Desktop Control` for desktop control |
+| **OpenClaw-only** | openclaw-os plugin + same Newest Desktop Control bridge |
 | **Both** | GDM session picker: Hermes / OpenClaw / Hybrid Workstation (GNOME + both) |
+
+---
+
+## 📦 Pre-Build Audit — 15 packages, zero collisions
+
+```
+$ python3 scripts/audit-debian-packages.py
+Source packages audited:    15
+Unique binary packages:     18
+Missing required files:      0
+Package collisions:          0
+Depends violations:          0
+✅ READY for dpkg-buildpackage
+```
+
+Run this on the host machine anytime. Catches the bug classes that bit us in v0.2.0:
+- Binary package name collisions (two source packages generating the same `.deb` name)
+- `Depends:` entries pointing to non-existent DuckBotOS packages
+- Missing `control`/`rules`/`changelog` per source package
+
+The audit confirmed 15 source packages → 18 unique binary package names (`duckbotos-mode-hermes/openclaw/hybrid` are meta variants; `duckbotos-kiosk-hermes` and `duckbotos-kiosk-openclaw` are separate source packages).
+
+See `docs/debian-packaging.md §14` for the audit script's full output format and the v0.2.2 collision-fix story.
 
 ---
 

@@ -54,7 +54,7 @@ When Hermes + OpenClaw are both installed, they coordinate through the agent bus
 **Examples:**
 - "Build a landing page for my SaaS" → orchestrator spawns research agent, copy agent, design agent, code agent → shows live progress graph → integrated result
 - "Analyze my Q3 financials" → data agent retrieves CSVs → analysis agent computes → summary agent writes report → agent emails draft for review
-- "Find me flights under $400 to NYC next week" → research agent searches → price agent compares → booking agent pre-fills form (via computer-use-linux) → user confirms
+- "Find me flights under $400 to NYC next week" → research agent searches → price agent compares → booking agent pre-fills form (via Newest Desktop Control) → user confirms
 
 **Technical:**
 - IPC: `/run/hermes-claw/agent-bus.sock` (JSON-RPC 2.0)
@@ -116,7 +116,7 @@ The whole OS is reachable by voice. Wake word activates, you speak commands, age
 - Knowledge graph of files, projects, people, topics.
 
 ### 8. Accessibility API Control (already designed)
-- Via `computer-use-linux`, agent clicks/types/reads any app's UI.
+- Via `Newest Desktop Control`, agent clicks/types/reads any app's UI.
 - "Book me on the 2pm flight" → navigates airline site, fills form, user clicks Pay.
 
 ### 9. Natural Language Firewall

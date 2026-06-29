@@ -161,19 +161,27 @@ All DuckBotOS packages live in `packages/`:
 
 | Package | Role | Key Depends |
 |---------|------|-------------|
-| `duckbotos-keyring` | GPG keyring for DuckBotOS APT repo | — |
 | `duckbotos-base` | Core OS (Weston, Chromium, network, systemd) | weston, network-manager, systemd |
-| `duckbotos-hermes` | Hermes agent + dashboard (port 9119) | duckbotos-base, hermes-agent |
-| `duckbotos-openclaw` | OpenClaw gateway + plugin (port 18789) | duckbotos-base, openclaw |
+| `duckbotos-branding` | Plymouth theme, MOTD, /etc/duckbotos/* layout | plymouth, gdm3 |
+| `duckbotos-hermes` | Hermes agent + dashboard (port 9119) | duckbotos-base, hermes-agent, duckbotos-brain |
+| `duckbotos-openclaw` | OpenClaw gateway + plugin (port 18789) | duckbotos-base, openclaw, duckbotos-brain |
 | `duckbotos-lm-studio` | LM Studio headless + systemd service (port 1234) | duckbotos-base, curl |
-| `duckbotos-browseros` | BrowserOS + kiosk launcher | duckbotos-base, weston |
-| `duckbotos-computer-use` | AT-SPI2 + Wayland portal MCP server | duckbotos-base |
-| `duckbotos-kiosk-hermes` | Weston kiosk + BrowserOS pointing at Hermes | duckbotos-hermes, duckbotos-browseros |
-| `duckbotos-kiosk-openclaw` | Weston kiosk + BrowserOS pointing at OpenClaw | duckbotos-openclaw, duckbotos-browseros |
-| `duckbotos-kiosk-hybrid` | GDM + session picker (Both mode) | duckbotos-hermes, duckbotos-openclaw |
-| `duckbotos-meta-hermes` | Full Hermes ISO meta-package | duckbotos-kiosk-hermes, duckbotos-lm-studio |
-| `duckbotos-meta-openclaw` | Full OpenClaw ISO meta-package | duckbotos-kiosk-openclaw, duckbotos-lm-studio |
-| `duckbotos-meta-hybrid` | Full Both-mode ISO meta-package | duckbotos-kiosk-hybrid, duckbotos-lm-studio |
+| `duckbotos-browseros` | BrowserOS + kiosk launcher (default browser) | duckbotos-base, weston |
+| `duckbotos-computer-use` | Newest Desktop Control (Lobster Edition) MCP — MIT, 38 tests | duckbotos-base, python3-pip |
+| `duckbotos-cua-bridge` | trycua/cua VM orchestration (pip + cua-driver binary) | duckbotos-base, python3-pip, curl |
+| `duckbotos-brain` | duckbot-rag-memory brain (default in ALL modes) | duckbotos-base, python3.12-venv, git |
+| `duckbotos-kiosk` | Weston + Chromium kiosk shell | weston, xwayland, chromium |
+| `duckbotos-kiosk-hermes` | Kiosk pre-configured for Hermes (http://localhost:9119) | duckbotos-kiosk |
+| `duckbotos-kiosk-openclaw` | Kiosk pre-configured for OpenClaw (http://localhost:18789/plugins/openclawos) | duckbotos-kiosk |
+| `duckbotos-session-picker` | Web UI on :8080 — choose Hermes / OpenClaw / Hybrid at boot | duckbotos-base, python3 |
+| `duckbotos-mode-hermes` | Install mode meta — Hermes-only stack | 9 deps |
+| `duckbotos-mode-openclaw` | Install mode meta — OpenClaw-only stack | 9 deps |
+| `duckbotos-mode-hybrid` | Install mode meta — Both agents + session picker | 12 deps |
+| `duckbotos-meta` | Catch-all (depends on mode-hermes) | duckbotos-mode-hermes |
+
+> **Verified 2026-06-29:** `scripts/audit-debian-packages.py` confirms 15 source
+> packages → 18 unique binary names, 0 collisions, 0 missing files, 0 Depends
+> violations. Run `python3 scripts/audit-debian-packages.py` anytime.
 
 ---
 
@@ -182,32 +190,18 @@ All DuckBotOS packages live in `packages/`:
 Rather than one ISO with complex installer branching, build three separate ISOs:
 
 ```
-# Hermes-only ISO
-duckbotos-hermes-x86_64.iso
-  duckbotos-meta-hermes
-  duckbotos-keyring
-  duckbotos-base
-  duckbotos-hermes
-  duckbotos-lm-studio
-  duckbotos-browseros
-  duckbotos-computer-use
-  duckbotos-kiosk-hermes
+# Hermes-only ISO — install duckbotos-mode-hermes
+# (pulls: base, branding, brain, computer-use, cua-bridge, kiosk,
+#  kiosk-hermes, lm-studio, browseros, hermes, openclaw NOT)
 
-# OpenClaw-only ISO
-duckbotos-openclaw-x86_64.iso
-  duckbotos-meta-openclaw
-  duckbotos-keyring
-  duckbotos-base
-  duckbotos-openclaw
-  duckbotos-lm-studio
-  duckbotos-browseros
-  duckbotos-computer-use
-  duckbotos-kiosk-openclaw
+# OpenClaw-only ISO — install duckbotos-mode-openclaw
+# (pulls: base, branding, brain, computer-use, cua-bridge, kiosk,
+#  lm-studio, browseros, openclaw, NOT hermes)
 
-# Both-mode ISO (with GDM session picker)
-duckbotos-both-x86_64.iso
-  duckbotos-meta-hybrid
-  duckbotos-keyring
+# Hybrid ISO — install duckbotos-mode-hybrid
+# (pulls: base, branding, brain, computer-use, cua-bridge, kiosk,
+#  kiosk-hermes, kiosk-openclaw, session-picker, hermes, openclaw,
+#  lm-studio, browseros, gdm3, gnome-session)
   duckbotos-base
   duckbotos-hermes
   duckbotos-openclaw
@@ -334,7 +328,7 @@ From the cx-distro README, these are confirmed facts:
 - [ ] Create `packages/duckbotos-kiosk-hermes/`
 - [ ] Create `packages/duckbotos-kiosk-openclaw/`
 - [ ] Create `packages/duckbotos-kiosk-hybrid/`
-- [ ] Create meta-packages (`duckbotos-meta-hermes`, `duckbotos-meta-openclaw`, `duckbotos-meta-hybrid`)
+- [ ] Create meta-packages (`duckbotos-mode-hermes`, `duckbotos-mode-openclaw`, `duckbotos-mode-hybrid`)
 - [ ] Update Makefile with three ISO build targets
 - [ ] Replace branding (Plymouth theme, wallpapers, ISO label, GDM theme)
 - [ ] Update CI/CD workflows for DuckBotOS

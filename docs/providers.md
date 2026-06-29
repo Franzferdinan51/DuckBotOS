@@ -432,7 +432,7 @@ fallback_chain:
 API keys are entered in the first-boot wizard (Step 3/5: Cloud Providers) and stored in:
 
 - **Hermes mode:** `~/.hermes/config.yaml`
-- **OpenClaw mode:** `/var/lib/openclaw/config.yaml`
+- **OpenClaw mode:** `~/.openclaw/config.yaml`
 - **Both modes also write:** `/etc/duckbotos/providers.yaml`
 
 ### 12.2 Environment Variable Injection
@@ -455,7 +455,7 @@ This keeps keys out of config files (which might be in git) and into the OS-mana
 ```bash
 # Config files with API keys
 chmod 600 ~/.hermes/config.yaml
-chmod 600 /var/lib/openclaw/config.yaml
+chmod 600 ~/.openclaw/config.yaml
 chmod 600 /etc/duckbotos/providers.yaml
 chmod 600 ~/.duckbotos/env
 
@@ -484,7 +484,7 @@ Planned additions:
 | `docs/architecture.md` §12 | Unified provider config: full `providers.yaml` with priority chain and task defaults |
 | `docs/installer.md` §4 | First-boot wizard: provider step (Step 3/5: Cloud Providers) and LM Studio step (Step 2/5) |
 | `docs/phase7-implementation.md` | How agents actually route between providers using complexity scoring — the decision logic behind the priority chain |
-| `docs/computer-use.md` | computer-use-linux MCP server — not a language model provider, but a desktop control provider the agent uses |
+| `docs/computer-use.md` | Newest Desktop Control MCP server (Lobster Edition) — not a language model provider, but a desktop control provider the agent uses |
 
 ---
 

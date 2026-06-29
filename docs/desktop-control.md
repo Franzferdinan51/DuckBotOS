@@ -103,7 +103,7 @@ Duckets' own `setup-config.js` script (`node scripts/setup-config.js openclaw`) 
 ### Path summary (no longer use these wrong paths)
 | Wrong (was) | Correct |
 |-------------|---------|
-| `/var/lib/openclaw/workspace/openclaw.json` | `~/.openclaw/openclaw.json` |
+| `~/.openclaw/openclaw.json` | `~/.openclaw/openclaw.json` |
 | `~/.openclaw/mcp.json` (separate file) | `mcp.servers` block in openclaw.json |
 | `~/.hermes/mcp-servers.json` | `~/hermes-config.json` |
 | `~/.hermes/mcp.json` | `~/hermes-config.json` |

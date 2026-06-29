@@ -85,7 +85,7 @@ duckbotos/                          # Fork of cxlinux-ai/cx-distro
 │   ├── duckbotos-browseros/        # BrowserOS browser (.deb)
 │   ├── duckbotos-hermes/          # Hermes agent + gateway
 │   ├── duckbotos-openclaw/        # OpenClaw gateway
-│   ├── duckbotos-computer-use/     # computer-use-linux MCP
+│   ├── duckbotos-computer-use/     # Newest Desktop Control MCP
 │   ├── duckbotos-kiosk/           # Weston + BrowserOS kiosk
 │   ├── hermesos-meta/              # Hermes-only meta-package
 │   ├── openclawos-meta/            # OpenClaw-only meta-package

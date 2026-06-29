@@ -1,13 +1,13 @@
-# DuckBotOS — computer-use-linux Integration
+# DuckBotOS — Newest Desktop Control Integration
 
-> How the `computer-use-linux` MCP server provides OS-level desktop control for agents.
+> How the `Newest Desktop Control` MCP server provides OS-level desktop control for agents.
 > Status: Draft v0.1 — 2026-06-29
 
 ---
 
 ## 1. Overview
 
-`computer-use-linux` is a Rust-based MCP (Model Context Protocol) server that gives AI agents the ability to:
+`Newest Desktop Control` is a Rust-based MCP (Model Context Protocol) server that gives AI agents the ability to:
 - **Read** the screen (screenshot, accessibility tree)
 - **Click** buttons and UI elements
 - **Type** text into input fields
@@ -21,7 +21,7 @@ This is the integration layer that lets Hermes and OpenClaw agents control the d
 
 ## 2. Why It Matters for DuckBotOS
 
-DuckBotOS's kiosk mode is **agent-first, not human-first**. When the OS boots into a Wayland kiosk running Chromium with the agent's web UI, a human can still interact with it using a keyboard and mouse. `computer-use-linux` provides:
+DuckBotOS's kiosk mode is **agent-first, not human-first**. When the OS boots into a Wayland kiosk running Chromium with the agent's web UI, a human can still interact with it using a keyboard and mouse. `Newest Desktop Control` provides:
 
 1. **Human-in-the-loop verification** — Agent suggests actions, human approves (optional)
 2. **Accessibility fallback** — When the agent's web UI can't be controlled via its own API, fall back to pixel-level control
@@ -46,7 +46,7 @@ DuckBotOS's kiosk mode is **agent-first, not human-first**. When the OS boots in
 ### 3.2 MCP Tools Exposed
 
 ```
-computer-use-linux exposes the following MCP tools:
+Newest Desktop Control exposes the following MCP tools:
 ├── screenshot          # Full screen capture → base64 PNG
 ├── click               # Click at x,y or on UI element by accessibility ID
 ├── double_click        # Double-click at x,y or on UI element
@@ -66,8 +66,8 @@ computer-use-linux exposes the following MCP tools:
 ### 3.3 Integration with DuckBotOS Services
 
 ```
-computer-use-linux.service (systemd)
-└── /usr/local/bin/computer-use-linux --port 9600
+Newest Desktop Control.service (systemd)
+└── /usr/local/bin/Newest Desktop Control --port 9600
     ├── AT-SPI2 socket (abstract)
     ├── wayland socket (from Weston compositor)
     └── MCP TCP port 9600
@@ -86,7 +86,7 @@ In **Both** mode, the agent bus (`/run/hermes-claw/agent-bus.sock`) multiplexes 
 ### 4.1 Service Unit
 
 ```ini
-# /etc/systemd/system/computer-use-linux.service
+# /etc/systemd/system/Newest Desktop Control.service
 [Unit]
 Description=Computer Use Linux — MCP Desktop Control Server
 After=weston-kiosk.service
@@ -95,7 +95,7 @@ PartOf=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/computer-use-linux \
+ExecStart=/usr/local/bin/Newest Desktop Control \
     --port 9600 \
     --wayland-socket /run/user/0/wayland-0 \
     --at-spi-socket /run/user/0/at-spi-2-0 \
@@ -201,15 +201,15 @@ async def computer_use_tool(tool_name: str, params: dict) -> dict:
 
 ### 6.2 How OpenClaw Connects
 
-OpenClaw uses its MCP client infrastructure. The `computer-use-linux` MCP server is registered as a local MCP tool provider in `openclaw.json`:
+OpenClaw uses its MCP client infrastructure. The `Newest Desktop Control` MCP server is registered as a local MCP tool provider in `openclaw.json`:
 
 ```json
 {
   "mcpServers": {
-    "computer-use-linux": {
+    "Newest Desktop Control": {
       "type": "http",
       "url": "http://127.0.0.1:9600/rpc",
-      "name": "computer-use-linux",
+      "name": "Newest Desktop Control",
       "description": "Desktop control: screenshot, click, type, scroll, execute"
     }
   }
@@ -218,18 +218,18 @@ OpenClaw uses its MCP client infrastructure. The `computer-use-linux` MCP server
 
 ### 6.3 Both Mode: Shared Access
 
-In Both mode, both agents may need simultaneous access to `computer-use-linux`. The agent bus (`/run/hermes-claw/agent-bus.sock`) acts as an **MCP multiplexer**:
+In Both mode, both agents may need simultaneous access to `Newest Desktop Control`. The agent bus (`/run/hermes-claw/agent-bus.sock`) acts as an **MCP multiplexer**:
 
 - Agent requests come in via JSON-RPC over the Unix socket
-- Agent bus forwards to `computer-use-linux` on port 9600
+- Agent bus forwards to `Newest Desktop Control` on port 9600
 - Responses are routed back to the requesting agent
 - Tool-level locking prevents conflicting actions (only one agent clicks at a time)
 
 ```python
-# agent-bus handler for computer-use-linux tool calls
+# agent-bus handler for Newest Desktop Control tool calls
 def handle_computer_use(session_id: str, method: str, params: dict):
     # Acquire tool lock (prevents concurrent click/type conflicts)
-    with tool_lock("computer-use-linux"):
+    with tool_lock("Newest Desktop Control"):
         return mcp_client.call(method, params)
     # Release lock after response
 ```
@@ -246,9 +246,9 @@ packages/duckbotos-computer-use/
 │   ├── control           # Metadata: Depends: at-spi2-core, xdg-desktop-portal, wl-clipboard
 │   └── postinst          # Post-install: create at-spi socket dir, set permissions
 ├── usr/local/bin/
-│   └── computer-use-linux  # The Rust binary (or install via cargo/rustup)
+│   └── Newest Desktop Control  # The Rust binary (or install via cargo/rustup)
 └── etc/systemd/system/
-    └── computer-use-linux.service
+    └── Newest Desktop Control.service
 ```
 
 ### 7.2 Binary Installation Options
@@ -256,9 +256,9 @@ packages/duckbotos-computer-use/
 **Option A: Pre-built binary from GitHub releases (easiest)**
 ```bash
 # In postinst
-curl -fsSL https://github.com/agent-sh/computer-use-linux/releases/latest/download/computer-use-linux-x86_64-unknown-linux-gnu \
-    -o /usr/local/bin/computer-use-linux
-chmod +x /usr/local/bin/computer-use-linux
+curl -fsSL https://github.com/Newest Desktop Control (Lobster Edition)/releases/latest/download/Newest Desktop Control-x86_64-unknown-linux-gnu \
+    -o /usr/local/bin/Newest Desktop Control
+chmod +x /usr/local/bin/Newest Desktop Control
 ```
 
 **Option B: Build from source in VM (requires Rust toolchain)**
@@ -266,7 +266,7 @@ chmod +x /usr/local/bin/computer-use-linux
 # In postinst (requires internet / rustup)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source $HOME/.cargo/env
-cargo install computer-use-linux
+cargo install Newest Desktop Control
 # Then move binary to /usr/local/bin/
 ```
 
@@ -288,39 +288,39 @@ Depends: at-spi2-core, xdg-desktop-portal, xdg-desktop-portal-gtk, wl-clipboard
 DuckBotOS defaults to port 9600. Override via kernel command line or environment:
 ```bash
 # Kernel command line
-computer-use-linux.port=9601
+Newest Desktop Control.port=9601
 
 # Or environment variable
-COMPUTER_USE_LINUX_PORT=9601 /usr/local/bin/computer-use-linux --port 9601
+COMPUTER_USE_LINUX_PORT=9601 /usr/local/bin/Newest Desktop Control --port 9601
 ```
 
 ### 8.2 Screenshot Quality
 
 ```bash
 # Low quality (fast, ~50KB PNG)
-computer-use-linux --screenshot-quality low
+Newest Desktop Control --screenshot-quality low
 
 # Medium (balanced)
-computer-use-linux --screenshot-quality medium
+Newest Desktop Control --screenshot-quality medium
 
 # High (uncompressed, ~5MB PNG)
-computer-use-linux --screenshot-quality high
+Newest Desktop Control --screenshot-quality high
 ```
 
 ### 8.3 Approval Mode
 
 ```bash
 # Always require human approval
-computer-use-linux --require-approval
+Newest Desktop Control --require-approval
 
 # Autonomous (no approval required — use with caution)
-computer-use-linux --no-require-approval
+Newest Desktop Control --no-require-approval
 
 # Approval via D-Bus notification (default on GNOME)
-computer-use-linux --approval-backend dbus-notify
+Newest Desktop Control --approval-backend dbus-notify
 
 # Approval via text file (fallback, for headless)
-computer-use-linux --approval-backend file:/run/hermes-claw/approvals/
+Newest Desktop Control --approval-backend file:/run/hermes-claw/approvals/
 ```
 
 ---
@@ -365,7 +365,7 @@ sudo usermod -aG input $USER
 
 ## 10. GitHub Repository
 
-**Repository:** `https://github.com/agent-sh/computer-use-linux`
+**Repository:** `https://github.com/Newest Desktop Control (Lobster Edition)`
 **License:** Apache 2.0 (verify before bundling)
 **Language:** Rust
 **Status in DuckBotOS:** Required, must be bundled in all ISO variants

@@ -448,7 +448,7 @@ cd ../..
 
 ### 4.6 Package: `duckbotos-computer-use`
 
-**Purpose:** Install `computer-use-linux` MCP server for desktop control.
+**Purpose:** Install `Newest Desktop Control` MCP server for desktop control.
 
 ```bash
 mkdir -p packages/duckbotos-computer-use/debian
@@ -464,21 +464,21 @@ Priority: optional
 Maintainer: DuckBotOS <franzferdinan51@github>
 Architecture: amd64
 Depends: ${misc:Depends}, libatspi2.0-0, libxtst6, python3
-Description: computer-use-linux — AT-SPI2 + Wayland portal MCP
+Description: Newest Desktop Control — AT-SPI2 + Wayland portal MCP
  Rust MCP server exposing AT-SPI2 accessibility + Wayland portal
  for AI agent desktop control (click, type, screenshot).
- Homepage: https://github.com/agent-sh/computer-use-linux
+ Homepage: https://github.com/Newest Desktop Control (Lobster Edition)
 EOF
 
-cat > usr/lib/systemd/system/computer-use-linux.service << 'SERVICE'
+cat > usr/lib/systemd/system/Newest Desktop Control.service << 'SERVICE'
 [Unit]
-Description=computer-use-linux MCP server
+Description=Newest Desktop Control MCP server
 After=hermes-gateway.service openclaw-gateway.service
 Wants=hermes-gateway.service openclaw-gateway.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/computer-use-linux --port 9600
+ExecStart=/usr/local/bin/Newest Desktop Control --port 9600
 Restart=always
 RestartSec=10
 

@@ -296,3 +296,47 @@ Description: DuckBotOS LM Studio integration
 ---
 
 *This doc covers debian/control authoring. For the full Debian build system (rules, patches, signing), see the Debian New Maintainer's Guide.*
+
+---
+
+## 14. Pre-Build Audit (REQUIRED before committing changes)
+
+**Always run `scripts/audit-debian-packages.py` before committing any `debian/control` or `debian/postinst` change.** The audit catches:
+
+1. **Missing required files** — `control`, `rules`, `changelog` per source package
+2. **Binary package name collisions** — two source packages generating the same binary name (would fail at dpkg install)
+3. **Internal Depends violations** — `Depends:` entries pointing to non-existent DuckBotOS packages
+
+```bash
+$ python3 scripts/audit-debian-packages.py
+PACKAGE                             CTRL  CHANGELOG  RULES  POSTINST  SERVICES   GIT OK
+------------------------------------------------------------------------------------------
+duckbotos-base                      ✅     ✅          ✅      ✅         —          ✅
+...
+============================================================
+PACKAGE COLLISION CHECK
+============================================================
+✅ All 18 binary package names are unique across 15 source packages
+============================================================
+SUMMARY
+============================================================
+✅ READY for dpkg-buildpackage
+```
+
+### What bit us in v0.2.0 → v0.2.2
+
+- `duckbotos-meta` was generating binaries `duckbotos-{hermes,openclaw,hybrid}` that collided with the standalone source packages of the same names. Renamed to `duckbotos-mode-{hermes,openclaw,hybrid}`.
+- `duckbotos-kiosk` was also generating `duckbotos-kiosk-hermes` (collision). Removed the colliding binary stanza — that package belongs to the standalone `duckbotos-kiosk-hermes` source.
+- `Conflicts: duckbotos-kiosk-openclaw` in `duckbotos-kiosk-hermes/debian/control` pointed at a phantom package. Created the full `duckbotos-kiosk-openclaw/` source package.
+
+**Lesson:** Use unique names for binary packages that come from different source packages. Either give each source its own binary name, or have ONE source package generate multiple binaries (and have the other source packages NOT generate the same binary).
+
+### Naming convention for DuckBotOS
+
+| Pattern | Usage |
+|---------|-------|
+| `duckbotos-<role>` | Service packages: `duckbotos-kiosk`, `duckbotos-brain`, `duckbotos-hermes` |
+| `duckbotos-kiosk-<mode>` | Kiosk mode URLs: `duckbotos-kiosk-hermes`, `duckbotos-kiosk-openclaw` |
+| `duckbotos-mode-<mode>` | Install mode meta-packages: `duckbotos-mode-hermes`, `duckbotos-mode-openclaw`, `duckbotos-mode-hybrid` |
+| `duckbotos-meta` | Catch-all default meta |
+

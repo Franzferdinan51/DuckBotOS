@@ -22,7 +22,7 @@ DuckBotOS builds on several projects, each with their own license:
 | **OpenClaw** | openclaw/openclaw | **Apache 2.0** | Our secondary agent runtime |
 | **LM Studio** | lmstudio-ai/lm-studio | **Proprietary** | Bundled as binary; llmster is the headless runtime |
 | **BrowserOS** | browseros-ai/BrowserOS | **AGPL v3** | Chromium-based agentic browser |
-| **computer-use-linux** | agent-sh/computer-use-linux | **MIT** | Rust MCP server for desktop control |
+| **Newest Desktop Control** | Newest Desktop Control (Lobster Edition) | **MIT** | Rust MCP server for desktop control |
 | **Weston** | wayland-project/weston | **MIT** | Wayland compositor (kiosk mode) |
 | **Ubuntu Base** | canonical/ubuntu | **GPLv2/GPLv3** | Base OS packages |
 | **DuckBotOS Docs** | (ours) | **CC BY 4.0** | This documentation |

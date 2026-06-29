@@ -79,8 +79,8 @@ openclaw-gateway.service
 ### Phase C: Computer-Use MCP Server (all ISOs)
 
 ```
-computer-use-linux.service          (all ISOs)
-  ExecStart=/usr/bin/computer-use-linux --port 9600
+Newest Desktop Control.service          (all ISOs)
+  ExecStart=/usr/bin/Newest Desktop Control --port 9600
   ListenStream=127.0.0.1:9600
   After=hermes-gateway.service openclaw-gateway.service
   WantedBy=multi-user.target
@@ -198,7 +198,7 @@ On a **fresh install** (OEM mode), the first-boot wizard runs after the autoinst
      Step 4: Model selection
        - GET http://127.0.0.1:1234/v1/models (LM Studio)
        - User picks default model
-       → Writes ~/.hermes/config.yaml or /var/lib/openclaw/config.yaml
+       → Writes ~/.hermes/config.yaml or ~/.openclaw/config.yaml
 
      Step 5: Create user account
        → Standard user creation (name, username, password)
@@ -303,7 +303,7 @@ sudo systemctl restart hermes-gateway.service openclaw-gateway.service
 | 6000 | wayland (Weston) | unix socket | Wayland compositor |
 | 9003 | browseros-mcp | 127.0.0.1 | BrowserOS MCP server |
 | 9119 | hermes-gateway | 127.0.0.1 | Hermes Web Dashboard |
-| 9600 | computer-use-linux | 127.0.0.1 | AT-SPI2 MCP server |
+| 9600 | Newest Desktop Control | 127.0.0.1 | AT-SPI2 MCP server |
 | 18789 | openclaw-gateway | 127.0.0.1 | OpenClaw Web UI |
 | 18797 | openclaw-gateway | 127.0.0.1 | OpenClaw gateway (internal) |
 | 19289 | openclaw-mcp | 127.0.0.1 | OpenClaw MCP server |

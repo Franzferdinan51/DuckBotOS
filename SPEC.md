@@ -27,7 +27,7 @@ Duckets' clarification: search existing projects first — there may be one for 
 | **cxlinux-ai/cx-core** (CX Terminal) | BSL 1.1 | Natural-language OS admin UX pattern; Rust daemon with Unix-socket IPC. |
 | **thesysdev/openclaw-os** | TBD | **The OpenClaw web workspace** — Next.js UI served at `/plugins/openclawos`. THIS becomes our "OpenClaw desktop." |
 | **nousresearch/hermes-agent** | MIT | Agent core. Ships **Hermes Web Dashboard** at `http://127.0.0.1:9119` + Hermes Desktop (Electron app). We use the web dashboard. |
-| **agent-sh/computer-use-linux** | TBD | **Rust MCP server for AT-SPI2 + Wayland portal desktop control.** This is the bridge letting agents *act on* the desktop — click, type, window-manage. CRITICAL for "deeply integrated." |
+| **Newest Desktop Control (Lobster Edition)** | TBD | **Rust MCP server for AT-SPI2 + Wayland portal desktop control.** This is the bridge letting agents *act on* the desktop — click, type, window-manage. CRITICAL for "deeply integrated." |
 | **agentkernel/openclaw-desktop** | TBD | First-run wizard UX (provider → channel → gateway). |
 | **MYusufY/agenticcore** | GPLv2 (Tiny Core Linux) | Reference only (Tiny Core too minimal). |
 | **nextain/naia-os** | TBD | Tauri/Rust desktop shell reference. |
@@ -44,11 +44,11 @@ Duckets' clarification: search existing projects first — there may be one for 
 
 This collapses the major UI scope. We don't build a custom desktop shell from scratch. We need:
 1. A kiosk-mode Wayland session that auto-loads the agent's web URL
-2. systemd services for both gateways + `computer-use-linux` MCP server
+2. systemd services for both gateways + `Newest Desktop Control` MCP server
 3. An installer that lets users pick which agent(s) to install
 4. A login-screen session picker for the running config
 
-**The OS-integration work is plumbing (startup, installer, dual-agent IPC, desktop control via computer-use-linux), not UI.**
+**The OS-integration work is plumbing (startup, installer, dual-agent IPC, desktop control via Newest Desktop Control), not UI.**
 
 ### 2.3 What We Inherit vs. Build From Scratch
 
@@ -81,13 +81,13 @@ This collapses the major UI scope. We don't build a custom desktop shell from sc
 
 | Mode | What Installs | What Boots |
 |------|--------------|------------|
-| **Hermes-only** | Hermes + Hermes web dashboard + `computer-use-linux` MCP | Weston kiosk → Chromium → `http://127.0.0.1:9119` |
-| **OpenClaw-only** | OpenClaw + openclaw-os plugin + `computer-use-linux` MCP | Weston kiosk → Chromium → `http://127.0.0.1:18789/plugins/openclawos` |
+| **Hermes-only** | Hermes + Hermes web dashboard + `Newest Desktop Control` MCP | Weston kiosk → Chromium → `http://127.0.0.1:9119` |
+| **OpenClaw-only** | OpenClaw + openclaw-os plugin + `Newest Desktop Control` MCP | Weston kiosk → Chromium → `http://127.0.0.1:18789/plugins/openclawos` |
 | **Both** | Both, with session picker | Login GDM: pick "Hermes" / "OpenClaw" / "Hybrid" per session |
 
 ### 3.2 Agent Capabilities (Both Modes)
 
-Both modes give the agent these OS-level capabilities (handled by the agent's own toolset, plus `computer-use-linux` MCP for desktop control):
+Both modes give the agent these OS-level capabilities (handled by the agent's own toolset, plus `Newest Desktop Control` MCP for desktop control):
 
 - **Package management** — `apt`, `snap`, `flatpak` via natural language
 - **Service management** — systemd units, startup apps
@@ -98,13 +98,13 @@ Both modes give the agent these OS-level capabilities (handled by the agent's ow
 - **User accounts** — add/remove users, sudo access (with policy gates)
 - **Cron / scheduled tasks** — manage via natural language
 - **Logs** — journalctl reading and summarization
-- **Desktop control** — `computer-use-linux` lets the agent click, type, screenshot
+- **Desktop control** — `Newest Desktop Control` lets the agent click, type, screenshot
 - **System control** — lockscreen, sleep, restart, shutdown
 
 ### 3.3 OpenClaw Integration (Both Mode + Dual-Agent IPC)
 
 When both are installed, OpenClaw Gateway + openclaw-os plugin run as system services; Hermes runs alongside (different ports). Shared infrastructure:
-- `computer-use-linux` MCP server — shared desktop control backend
+- `Newest Desktop Control` MCP server — shared desktop control backend
 - D-Bus session bus — both can register and call methods
 - IPC bus `/run/hermes-claw/agent-bus.sock` (JSON-RPC 2.0)
 - `hermes claw migrate` — Hermes can import OpenClaw's workspace
@@ -127,7 +127,7 @@ Alternative simpler approach: prototype ISOs via Cubic with pre-installed agents
 ```
 GRUB → Kernel → systemd
   → hermes.service / openclaw-gateway.service / both
-  → computer-use-linux.service (MCP on port, app control)
+  → Newest Desktop Control.service (MCP on port, app control)
   → weston-kiosk.service  (Wayland compositor)
   → chromium-kiosk.service  (fullscreen dashboard URL)
   → Agent active on login
@@ -158,13 +158,13 @@ Ubuntu 24.04 LTS (Noble Numbat)
 ```
 HermesAgent/                          OpenClawAgent/
 ├── /usr/lib/hermes/                  ├── /opt/openclaw/
-├── ~/.hermes/                        ├── /var/lib/openclaw/plugins/openclawos/
+├── ~/.hermes/                        ├── ~/.openclaw/extensions/
 ├── systemd/hermes.service            ├── systemd/openclaw-gateway.service
 ├── /etc/hermes/weston-kiosk.sh       ├── /etc/openclaw/weston-kiosk.sh
 └── /etc/hermes/chromium-kiosk.sh     └── /etc/openclaw/chromium-kiosk.sh
 
 Shared/
-├── /usr/bin/computer-use-linux     # Rust MCP for desktop control
+├── /usr/bin/Newest Desktop Control     # Rust MCP for desktop control
 ├── /run/hermes-claw/agent-bus.sock # JSON-RPC IPC bus
 └── /etc/hermes-claw/credentials/   # TPM-backed shared secrets
 ```
@@ -191,7 +191,7 @@ Shared/
                         /run/hermes-claw/agent-bus.sock
         ↑
         │
-[computer-use-linux MCP server on port 9600]
+[Newest Desktop Control MCP server on port 9600]
         ↑
         │
     Both agents connect as MCP clients → desktop control via AT-SPI2 + portals
@@ -229,7 +229,7 @@ In "Both" mode, GDM is customized (theme + sessions.list) to show three sessions
 - `openclawos-meta` — pulls OpenClaw + openclaw-os plugin
 - `hermesos-hybrid-meta` — both with session picker
 - `hermesos-kiosk` — weston + chromium kiosk config
-- `computer-use-linux` MCP package
+- `Newest Desktop Control` MCP package
 - Custom APT repo: `apt.hermes-os.dev`
 
 ---
@@ -274,7 +274,7 @@ We inherit: AppArmor profiles, Firejail sandboxing, security defaults (sysctl, n
 
 ### Phase 1 — Research & Planning (NOW) ✅
 - ✅ Searched web + GitHub for existing AI-OS projects
-- ✅ Found: CX Linux, Hermes dashboard, openclaw-os, computer-use-linux, agentkernel/openclaw-desktop
+- ✅ Found: CX Linux, Hermes dashboard, openclaw-os, Newest Desktop Control, agentkernel/openclaw-desktop
 - ✅ Drafted SPEC.md (this file)
 - ✅ Drafted README.md (GitHub-ready)
 - ✅ Drafted OPEN-ISSUES.md
@@ -296,7 +296,7 @@ We inherit: AppArmor profiles, Firejail sandboxing, security defaults (sysctl, n
 - GDM theme with three session entries
 - Agent bus IPC daemon
 - Shared credential store (TPM-backed when available)
-- `computer-use-linux` MCP server running as system service
+- `Newest Desktop Control` MCP server running as system service
 
 ### Phase 5 — Polish & Release
 - Plymouth boot theme

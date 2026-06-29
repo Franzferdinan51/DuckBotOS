@@ -42,7 +42,7 @@ duckbotos-both-x86_64.iso       # Both modes
 | `hermes-agent` | ✅ | ❌ | ✅ |
 | `openclaw` | ❌ | ✅ | ✅ |
 | `openclawos-plugin` | ❌ | ✅ | ✅ |
-| `computer-use-linux` | ✅ | ✅ | ✅ |
+| `Newest Desktop Control` | ✅ | ✅ | ✅ |
 | `lm-studio-headless` | ✅ | ✅ | ✅ |
 | `hermesos-kiosk` | ✅ | ❌ | ❌ |
 | `openclawos-kiosk` | ❌ | ✅ | ❌ |
@@ -213,7 +213,7 @@ lm_studio:
 channel: telegram  # or: cli, web, etc.
 
 # ~/.hermes/config.yaml (OpenClaw mode)
-# /var/lib/openclaw/config.yaml
+# ~/.openclaw/config.yaml
 providers:
   minimax:
     type: openai-compatible
@@ -270,7 +270,7 @@ browseros
 hermesos-kiosk
 
 # Desktop control
-computer-use-linux
+Newest Desktop Control
 
 # DuckBotOS base
 duckbotos-base
@@ -306,7 +306,7 @@ browseros
 openclawos-kiosk
 
 # Desktop control
-computer-use-linux
+Newest Desktop Control
 
 # DuckBotOS base
 duckbotos-base
@@ -346,7 +346,7 @@ hermesos-hybrid-kiosk
 duckbotos-gdm-sessions
 
 # Desktop control
-computer-use-linux
+Newest Desktop Control
 
 # DuckBotOS base
 duckbotos-base
@@ -393,14 +393,14 @@ case "$MODE" in
   hermes)
     export KIOSK_URL="http://127.0.0.1:9119"
     systemctl start hermes-gateway.service
-    systemctl start computer-use-linux.service
+    systemctl start Newest Desktop Control.service
     systemctl start weston-kiosk.service
     systemctl start browseros-kiosk.service
     ;;
   openclaw)
     export KIOSK_URL="http://127.0.0.1:18789/plugins/openclawos"
     systemctl start openclaw-gateway.service
-    systemctl start computer-use-linux.service
+    systemctl start Newest Desktop Control.service
     systemctl start weston-kiosk.service
     systemctl start browseros-kiosk.service
     ;;
@@ -408,7 +408,7 @@ case "$MODE" in
     # GNOME desktop, agents in side panel
     systemctl start hermes-gateway.service
     systemctl start openclaw-gateway.service
-    systemctl start computer-use-linux.service
+    systemctl start Newest Desktop Control.service
     systemctl start gnome-session
     ;;
 esac
@@ -489,7 +489,7 @@ echo "[DuckBotOS] Kiosk setup complete."
 - [ ] Fork cxlinux-ai/cx-distro to Franzferdinan51/cx-distro
 - [ ] Clone fork as `duckbotos/` base
 - [ ] Create `packages/duckbotos-base/DEBIAN/control`
-- [ ] Create `packages/hermesos-meta/DEBIAN/control` (Depends: duckbotos-base, hermes-agent, lm-studio-headless, browseros, hermesos-kiosk, computer-use-linux)
+- [ ] Create `packages/hermesos-meta/DEBIAN/control` (Depends: duckbotos-base, hermes-agent, lm-studio-headless, browseros, hermesos-kiosk, Newest Desktop Control)
 - [ ] Create `packages/openclawos-meta/DEBIAN/control`
 - [ ] Create `packages/hermesos-hybrid-meta/DEBIAN/control`
 - [ ] Create `iso/live-build/config/package-lists/hermes.list`

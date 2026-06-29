@@ -85,8 +85,74 @@ Immediate next steps:
 3. Replace cx-terminal in fork with Hermes install
 4. Add LM Studio headless .deb to packages
 5. Add BrowserOS to packages
-6. Add computer-use-linux to packages
+6. Add Newest Desktop Control to packages
 7. Configure Weston kiosk + Chromium kiosk service
 8. Build first Hermes-only ISO
 
 ~3.5 hrs of build work from unblocked state to first bootable ISO.
+
+---
+
+## ✅ RESOLVED Issues (2026-06-29)
+
+### v0.2.0 — Config path audit found 4 bugs
+
+Every MCP/brain registration postinst was writing to nonexistent/wrong files:
+
+| Was (broken) | Correct |
+|---|---|
+| `/var/lib/openclaw/workspace/openclaw.json` | `~/.openclaw/openclaw.json` |
+| `~/.openclaw/mcp.json` (separate file — doesn't exist) | `mcp.servers` block in openclaw.json |
+| `~/.hermes/mcp.json` (Hermes doesn't use this) | `~/hermes-config.json` (mcp_servers.{name} value is JSON-STRINGIFIED) |
+
+Also discovered OpenClaw has **two completely different config formats**:
+
+- **MCP servers**: `mcp.servers.{name}` — nested object under `mcp`
+- **Plugins/extensions**: `plugins.entries.{name}.enabled` + `.config` — separate block
+
+The 4 fixed packages: `duckbotos-{openclaw,brain,computer-use,cua-bridge}`. Committed in `3f31bfc`.
+
+### v0.2.1 — Hermes + OpenClaw formats documented
+
+`docs/desktop-control.md` now has a 200+ line reference including:
+- "Two different concepts in OpenClaw" table
+- Hermes mcp_servers format (stringified value) verified against real `~/hermes-config.json`
+- OpenClaw mcp.servers format (nested object) verified against `~/.openclaw/openclaw.json`
+- "Path bug summary" at the end so other agents don't repeat the mistakes
+
+Also added `scripts/verify-config-formats.py` — read-only integration check that validates the formats. Committed in `68c0a13`, `96d7a25`.
+
+### v0.2.2 — Packaging audit found 6 more bugs
+
+`scripts/audit-debian-packages.py` (re-runnable, < 1 sec) catches both bug classes:
+
+1. **Binary package name collisions** — `duckbotos-meta` was generating binaries `duckbotos-{hermes,openclaw,hybrid}` that collided with the standalone source packages. Renamed → `duckbotos-mode-{hermes,openclaw,hybrid}`.
+
+2. **Missing `duckbotos-kiosk/debian/postinst`** — the service file existed, rules installed it, but no postinst enabled it. Created one that seeds the kiosk URL + enables the service.
+
+3. **`duckbotos-kiosk-openclaw` was a phantom package** referenced by `Conflicts:`. Created the full package as a sibling of `duckbotos-kiosk-hermes`.
+
+4. **`duckbotos-branding` was empty** — promised Plymouth/GDM/wallpapers, installed 0 bytes. Created real assets: Plymouth theme (`.plymouth` + `.script` + 32×32 gold duck PNG), MOTD, `/etc/profile.d/duckbotos-branding.sh`, `/etc/duckbotos/branding` shell prompt config.
+
+5. **`duckbotos-base` had no postinst** — `/etc/duckbotos/` directory was never created. All later packages writing to it would silently fail. Created postinst that makes the layout + stamps version + writes `/etc/duckbotos/defaults.conf` with canonical service URLs.
+
+6. **Install mod had stale "computer-use-linux" references** + missing `duckbotos-cua-bridge` + `duckbotos-brain` in `duckbotos-hybrid` Depends. Rewrote all meta descriptions + added the missing Depends.
+
+Committed in `223e87e`.
+
+### v0.2.3 — Docs pass
+
+All 24 docs updated:
+- `computer-use-linux` → `Newest Desktop Control` (Lobster Edition) everywhere
+- `/var/lib/openclaw/*` → `~/.openclaw/*` everywhere (where applicable — some references in `docs/desktop-control.md` "Path bug summary" table are intentionally preserved)
+- Package counts: 14 → 15 source packages, 18 unique binary packages
+- `docs/debian-packaging.md §14` added: "Pre-Build Audit (REQUIRED before committing changes)" with v0.2.2 collision-fix story
+- `README.md`: audit banner added
+
+### Final state (2026-06-29 15:30 EDT)
+
+- 15 source packages verified clean by `scripts/audit-debian-packages.py`
+- 18 unique binary package names → 0 collisions → 0 missing files → 0 Depends violations
+- ✅ **READY for dpkg-buildpackage** (once UTM VM is created)
+
+Next unresolved: setting up the Linux build VM (UTM, Ubuntu 24.04) to actually run `./src/build.sh`.

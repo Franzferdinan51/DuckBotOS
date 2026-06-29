@@ -103,7 +103,7 @@ duckbotos-kiosk-launch.sh:
 
 2. **HERMES_HOME variable in postinst** — the `REAL_HOME` detection (`getent passwd | awk -F: '$3 >= 1000 {print $6; exit}')` works in the chroot but might get the wrong user. The chroot runs as root; the real user is created by the Ubuntu installer later. May need to use `/home/ubuntu` or a known username.
 
-3. **debian/changelog files: DONE** — all 13 packages have them now.
+3. **debian/changelog files: DONE** — all 15 source packages have them now.
 
 4. **duckbotos-brain postinst ordering bug**: `duckbotos-openclaw/postinst` tries to register the brain plugin only if duckbotos-brain is already installed. If openclaw runs first, the plugin registration is skipped silently. Fix: add `duckbotos-brain` to `duckbotos-openclaw` Depends, OR split registration into a standalone trigger postinst that fires for all `duckbotos-*` packages.
 
@@ -120,7 +120,7 @@ duckbotos-kiosk-launch.sh:
    - Install the `.AppImage` or `.deb`
    - Add to PATH
 
-8. **computer-use-linux** — needs to be built from source (Rust/cargo). The package `debian/control` lists `cargo` as a Build-Depends but the actual build from source isn't in the postinst. Could use pre-built binaries from their releases instead.
+8. **Newest Desktop Control** — needs to be built from source (Rust/cargo). The package `debian/control` lists `cargo` as a Build-Depends but the actual build from source isn't in the postinst. Could use pre-built binaries from their releases instead.
 
 
 ## Next Steps in Order

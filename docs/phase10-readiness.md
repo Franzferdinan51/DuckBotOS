@@ -114,7 +114,7 @@ Rebuild: `make iso`. Verify ISO boots.
 
 **Mutation 2: Replace cx-* packages with duckbotos-***
 
-Create the 13 packages listed in `docs/cx-linux-fork.md` §5. Start with the simplest meta-packages first:
+Create the 18 binary packages (15 sources) listed in `docs/cx-linux-fork.md` §5. Start with the simplest meta-packages first:
 
 ```bash
 mkdir -p packages/duckbotos-keyring/debian
@@ -157,7 +157,7 @@ duckbotos-lm-studio
 duckbotos-browseros
 duckbotos-computer-use
 duckbotos-kiosk-hermes
-duckbotos-meta-hermes
+duckbotos-mode-hermes
 weston
 network-manager
 systemd
