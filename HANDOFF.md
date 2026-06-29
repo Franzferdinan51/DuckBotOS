@@ -57,7 +57,7 @@ sudo apt update && sudo apt install -y \
 - `cx-distro/src/mods/50-duckbotos-meta-mod/install.sh` — reads DUCKBOTOS_MODE, selects packages
 - `cx-distro/src/mods/51-duckbotos-install-mod/install.sh` — clones fork, builds packages, installs by mode
 
-### Packages (12 total — all have `debian/control` + `debian/rules`)
+### Packages (13 total — all have `debian/control` + `debian/rules` + `debian/changelog`)
 | Package | Purpose | Key File |
 |---------|---------|----------|
 | `duckbotos-base` | Core OS: Python + Node + Weston | Essential |
@@ -100,26 +100,27 @@ duckbotos-kiosk-launch.sh:
    - Build deps may be missing some package
    - The mods assume internet access in the chroot — might need `lb config --apt-http-proxy` or offline mode
 
-2. **HERMES_URL variable in postinst** — the `REAL_HOME` detection (`getent passwd | awk -F: '$3 >= 1000 {print $6; exit}'`) works in the chroot but might get the wrong user. The chroot runs as root; the real user is created by the Ubuntu installer later. May need to use `/home/ubuntu` or a known username.
+2. **HERMES_HOME variable in postinst** — the `REAL_HOME` detection (`getent passwd | awk -F: '$3 >= 1000 {print $6; exit}')` works in the chroot but might get the wrong user. The chroot runs as root; the real user is created by the Ubuntu installer later. May need to use `/home/ubuntu` or a known username.
 
-3. **No `changelog` files** — each package needs a `debian/changelog` for `dpkg-buildpackage`. These are auto-generated with `dch -i` but haven't been created yet.
+3. **debian/changelog files: DONE** — all 13 packages have them now.
 
-4. **cxlinux-ai/cx-distro upstream** — the fork still has `upstream` remote pointing to cxlinux-ai/cx-distro. Can merge upstream changes with `git fetch upstream && git merge upstream/main`.
+4. **duckbotos-brain postinst ordering bug**: `duckbotos-openclaw/postinst` tries to register the brain plugin only if duckbotos-brain is already installed. If openclaw runs first, the plugin registration is skipped silently. Fix: add `duckbotos-brain` to `duckbotos-openclaw` Depends, OR split registration into a standalone trigger postinst that fires for all `duckbotos-*` packages.
 
-5. **LM Studio install** — the `duckbotos-lm-studio` package doesn't actually install LM Studio. It needs to:
+5. **cxlinux-ai/cx-distro upstream** — the fork still has `upstream` remote pointing to cxlinux-ai/cx-distro. Can merge upstream changes with `git fetch upstream && git merge upstream/main`.
+
+6. **LM Studio install** — the `duckbotos-lm-studio` package doesn't actually install LM Studio. It needs to:
    - Add the LM Studio APT repo key + sources.list
    - `apt install lm-studio` (they have an official .deb)
    - Or download the AppImage and convert to deb with `appimage2deb`
    - Current postinst only writes the config file — doesn't install LM Studio itself
 
-6. **BrowserOS install** — same issue. `duckbotos-browseros` postinst sets it as default browser but doesn't actually install BrowserOS. Need to:
+7. **BrowserOS install** — same issue. `duckbotos-browseros` postinst sets it as default browser but doesn't actually install BrowserOS. Need to:
    - Download from `https://github.com/browseros-ai/BrowserOS/releases`
    - Install the `.AppImage` or `.deb`
    - Add to PATH
 
-7. **computer-use-linux** — needs to be built from source (Rust/cargo). The package `debian/control` lists `cargo` as a Build-Depends but the actual build from source isn't in the postinst. Could use pre-built binaries from their releases instead.
+8. **computer-use-linux** — needs to be built from source (Rust/cargo). The package `debian/control` lists `cargo` as a Build-Depends but the actual build from source isn't in the postinst. Could use pre-built binaries from their releases instead.
 
----
 
 ## Next Steps in Order
 
