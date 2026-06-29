@@ -35,7 +35,7 @@
 ## Phase 2 — Ready to Start (D1-D5 Unblocked)
 
 ### 1. Hardware target
-- [x] **CPU-only** for v1 — no NVIDIA/AMD driver bundling needed
+- [x] **NVIDIA GPU** — target machine has NVIDIA GPU. Keep cx-gpu-nvidia package. LM Studio GPU inference a bonus. CPU-only fallback still works on other hardware.
 
 ### 2. Models & Providers (Confirmed)
 - [x] **LM Studio first-class** — installed by default, URL input, model load/select from OS UI

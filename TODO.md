@@ -9,7 +9,7 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| D1 **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ✅ DONE — **CPU-only** (v1 ships without GPU drivers) | Affects driver bundling in ISO |
+| D1 **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ✅ DONE — **NVIDIA GPU on target machine** (Duckets 10:40). Keep cx-gpu-nvidia package. LM Studio GPU inference a bonus. | Affects driver bundling in ISO |
 | D2 **Boot type** — Live USB only / Full install / Both | ✅ DONE — **Both** (Live USB + full install) | Affects preseed/installer design |
 | D3 **License** — Apache 2.0 with CX Linux attribution, ok? | ✅ DONE — **Apache 2.0** confirmed | Blocks Phase 2 |
 | D4 **Both mode GDM picker** — Hermes / OpenClaw / Hybrid session picker | ✅ DONE — **Yes** | Affects Phase 4 |
