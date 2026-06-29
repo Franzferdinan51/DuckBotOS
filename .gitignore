@@ -35,3 +35,7 @@ __pycache__/
 
 # Rust
 target/
+cx-distro/
+cx-distro-local/
+cx-distro/
+DuckBotOS-local/
