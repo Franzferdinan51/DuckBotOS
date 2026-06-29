@@ -9,11 +9,11 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| D1 | **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ⏳ Pending | Affects driver bundling in ISO |
-| D2 | **Boot type** — Live USB only / Full install / Both | ⏳ Pending | Affects preseed/installer design |
-| D3 | **License** — Apache 2.0 with CX Linux attribution, ok? | ⏳ Pending | Blocks Phase 2 |
-| D4 | **Both mode GDM picker** — Hermes / OpenClaw / Hybrid, ok? | ⏳ Pending | Affects Phase 4 |
-| D5 | **Rule override scope** — LM Studio local models: HermesOS only or all projects? | ⏳ Pending (default: HermesOS only) | Was asked at 23:53, no reply yet |
+| D1 **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ✅ DONE — **CPU-only** (v1 ships without GPU drivers) | Affects driver bundling in ISO |
+| D2 **Boot type** — Live USB only / Full install / Both | ✅ DONE — **Both** (Live USB + full install) | Affects preseed/installer design |
+| D3 **License** — Apache 2.0 with CX Linux attribution, ok? | ✅ DONE — **Apache 2.0** confirmed | Blocks Phase 2 |
+| D4 **Both mode GDM picker** — Hermes / OpenClaw / Hybrid session picker | ✅ DONE — **Yes** | Affects Phase 4 |
+| D5 **Rule override scope** — LM Studio local models: HermesOS only or all projects? | ✅ DONE — **HermesOS only** (cloud-only stays for other projects) (default: HermesOS only) | Was asked at 23:53, no reply yet |
 
 ---
 
@@ -21,8 +21,8 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P2-1 | Set up Linux build VM (Ubuntu 24.04) — UTM or Vagrant | ⏳ Pending | live-build needs Linux, can't do on Mac |
-| P2-2 | Fork cxlinux-ai/cx-distro on GitHub | ⏳ Pending | Fork to Franzferdinan51 account |
+| P2-1 Set up Linux build VM (Ubuntu 24.04) — UTM on Mac mini | ⏳ Pending | live-build needs Linux, can't do on Mac. UTM Ubuntu 24.04 VM, 4 cores, 8GB RAM, 64GB disk. | live-build needs Linux, can't do on Mac |
+| P2-2 Fork cxlinux-ai/cx-distro on GitHub | ⏳ Pending — CAN START NOW (gh CLI, no VM needed) | Fork to Franzferdinan51 account, clone locally. | Fork to Franzferdinan51 account |
 | P2-3 | Replace `cx-terminal` (Rust) in fork with Hermes install script | ⏳ Pending | Swap cxlinux-ai cx-terminal for Hermes |
 | P2-4 | Add LM Studio .deb package to ISO | ⏳ Pending | Headless install research needed |
 | P2-5 | Add BrowserOS to ISO + set as default browser | ⏳ Pending | BrowserOS Linux install research needed |

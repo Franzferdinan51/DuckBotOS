@@ -16,84 +16,77 @@
 - **All Hermes + OpenClaw providers included** — MiniMax, Grok, OpenAI, Anthropic, OpenRouter, LM Studio, etc.
 - **Cool AI features required** — see docs/features.md (Tier 1: 5 flagship features)
 
+## ✅ D1-D5 ALL DECIDED (Duckets 2026-06-29 09:25)
+
+| # | Decision | Answer | Notes |
+|---|----------|--------|-------|
+| D1 | GPU target | **CPU-only** | v1 ships without NVIDIA/AMD drivers |
+| D2 | Boot type | **Both** | Live USB + full install |
+| D3 | License | **Apache 2.0** | CX Linux attribution ok |
+| D4 | Both mode GDM picker | **Yes** | Hermes / OpenClaw / Hybrid session picker |
+| D5 | LM Studio rule scope | **HermesOS/DuckBotOS only** | Cloud-only stays for other projects |
+
 ## CRITICAL: Base OS Decision
 - [x] **Path B: Ubuntu 24.04 + custom kiosk** (REJECTED: FydeOS/Chromium OS)
   - Fork cxlinux-ai/cx-distro build pipeline
   - Full systemd control
   - Build on Linux VM (live-build needs Linux)
 
-## Still Pending Decisions
+## Phase 2 — Ready to Start (D1-D5 Unblocked)
 
 ### 1. Hardware target
-- [ ] GPU class? (NVIDIA / AMD / CPU-only for v1 ISO drivers) ← CRITICAL FOR BUILD
-- [ ] x86_64 PC? Or ARM (RPi)?
+- [x] **CPU-only** for v1 — no NVIDIA/AMD driver bundling needed
 
-### 2. License (Decision Needed)
-- [ ] **BSL 1.1** for ISO build pipeline (forked from cxlinux-ai/cx-distro) — ok? BSL 1.1 means: free for personal/educational/open-source, commercial needs HashiCorp license or wait until 2029-08-01. See docs/license.md for full analysis.
-
-### 2. Models & Providers (Mostly Confirmed)
+### 2. Models & Providers (Confirmed)
 - [x] **LM Studio first-class** — installed by default, URL input, model load/select from OS UI
 - [x] **All Hermes + OpenClaw providers** — MiniMax, Grok, OpenAI, Anthropic, OpenRouter, etc.
-- [ ] Self-hosted llama.cpp bundling in ISO? (separate from LM Studio)
+- [ ] Self-hosted llama.cpp bundling in ISO? (separate from LM Studio — future)
 
 ### 3. Boot type
-- [ ] Live USB only / Full disk install / Both?
+- [x] **Both** — Live USB + full disk install
 
 ### 4. GitHub repo
 - [x] **https://github.com/Franzferdinan51/DuckBotOS** (Duckets 00:06)
-- [ ] Default branch: `main` ✓
-- [ ] Make public? (Default: yes per Duckets)
+- [x] Default branch: `main` ✓
+- [x] Repo public ✓
 
 ### 5. License
-- [ ] Apache 2.0 with CX Linux + Hermes/OpenClaw attribution — ok?
+- [x] **Apache 2.0** with CX Linux + Hermes/OpenClaw attribution — CONFIRMED
 
 ### 6. Both mode (session picker)
-- [ ] GDM session picker: Hermes / OpenClaw / Hybrid Workstation — ok?
+- [x] **GDM session picker: Hermes / OpenClaw / Hybrid Workstation** — CONFIRMED
 
 ## What's Built
 - ✅ SPEC.md (DuckBotOS, comprehensive architecture)
 - ✅ README.md (GitHub-ready)
-- ✅ OPEN-ISSUES.md (this file, updated)
-- ✅ docs/features.md (kinds of really cool AI features — 5 Tier 1 flagships)
-- ✅ P5-1 docs/architecture.md (740 lines — full technical stack documented)
-- ✅ P5-2 docs/installer.md (510 lines — Subiquity OEM, autoinstall, three ISOs)
-- ✅ P5-3 docs/providers.md (477 lines — provider matrix, LM Studio config)
-- ✅ P5-4 docs/lm-studio.md (8443 bytes — llmster install, systemd, API endpoints)
-- ✅ P5-5 docs/browseros.md (9265 bytes — .deb install, default browser, kiosk mode)
-- ✅ P5-6 docs/cx-linux-fork.md (8671 bytes — fork process, file map, inheritance guide)
-- ✅ P5-11 docs/contributing.md (10746 bytes — fork process, build cmds, package dev, git workflow)
-- ✅ P5-12 docs/license.md (11082 bytes — BSL 1.1 decision, upstream licenses, compatibility matrix)
-- ⏳ Phase 2 needs Linux VM (cxlinux-ai build env)
-- ⏳ P2-2 Fork cxlinux-ai/cx-distro on GitHub
-- ⏳ First ISO build
-
-## What's Built
-- ✅ SPEC.md (DuckBotOS, comprehensive architecture)
-- ✅ README.md (GitHub-ready)
-- ✅ OPEN-ISSUES.md (this file, updated)
+- ✅ OPEN-ISSUES.md (this file, all D1-D5 resolved)
 - ✅ docs/features.md (15 cool AI features — 5 Tier 1, 5 Tier 2, 5 Tier 3)
-- ✅ TODO.md (full todo list — all phases, all priorities, updated each cycle)
-- ✅ All Phase 5 docs completed (P5-1 through P5-6)
-- ✅ docs/phase10-readiness.md (8.0KB — docs→ISO bridge, blockers + 3.5hr estimate)
-- ⏳ Phase 2 needs Linux VM (cxlinux-ai build env)
-- ⏳ P2-2 Fork cxlinux-ai/cx-distro on GitHub
+- ✅ TODO.md (full todo list — all phases, all priorities)
+- ✅ 21 documentation files across docs/
+- ✅ packages/duckbotos-meta/debian/control (7 packages specced)
+- ⏳ Linux VM setup needed (UTM on Mac mini or separate Linux machine)
+- ⏳ Fork cxlinux-ai/cx-distro (can start NOW via gh CLI)
 - ⏳ First ISO build
 
 ## Cron Job Active
 - Every 35 mins, isolated agent cycle on MiniMax M2.7
-- Working on: docs/architecture.md, docs/installer.md, docs/providers.md, CX Linux fork study, LM Studio Linux install research, BrowserOS Linux setup research
+- Working on: cx-linux fork via gh CLI, VM setup prep, next priority tasks
 - Cron ID: b311e619-9827-472c-a9f4-60ed5452aeb4
-- Cron also updates TODO.md after each cycle to mark progress
-
-## Cycle 2026-06-29 06:59 EDT
-- Verified all 16 docs complete (no skeleton stubs)
-- Wrote `docs/phase10-readiness.md` (8.0KB) — the docs→ISO bridge doc
-- Updated TODO.md with current cycle status
-- Single best next step: Telegram Duckets to ask for UTM availability + D1-D5 answers (one round-trip)
-- After unblock: ~3.5 hrs to first bootable ISO
 
 ## Duckets' "Do It All" Scope (2026-06-29 00:10)
-Duckets said "I wanna do it all make sure your making a Todo list to keep track of what we wanna do and updating memory as well"
-→ TODO.md created at ~/Desktop/DuckBotOS/TODO.md with all phases tracked
-→ Brain updated with full todo state
-→ Cron updated to maintain TODO.md per cycle
+Duckets said "I wanna do it all" — full scope. TODO.md tracks ALL work. Brain updated each cycle.
+## Phase 2 Kickoff — Ready to Build (2026-06-29 09:25 EDT)
+
+D1-D5 all answered. All decision blockers cleared. Phase 2 can begin.
+
+Immediate next steps:
+1. Fork cxlinux-ai/cx-distro on GitHub (gh CLI, no VM needed)
+2. Set up Linux build VM (UTM Ubuntu 24.04 on Mac mini)
+3. Replace cx-terminal in fork with Hermes install
+4. Add LM Studio headless .deb to packages
+5. Add BrowserOS to packages
+6. Add computer-use-linux to packages
+7. Configure Weston kiosk + Chromium kiosk service
+8. Build first Hermes-only ISO
+
+~3.5 hrs of build work from unblocked state to first bootable ISO.
