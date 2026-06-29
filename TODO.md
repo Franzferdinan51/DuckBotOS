@@ -1,7 +1,7 @@
 # DuckBotOS — Todo List
 
-> Last updated: 2026-06-29 15:30 EDT — v0.2.3 docs pass + audit-script coverage
-> Audit: run `python3 scripts/audit-debian-packages.py` to verify clean
+> Last updated: 2026-06-29 18:00 EDT — v0.2.4: cx-distro fork merged, 15 complete packages, build-iso.yml fixed, User=%h fix
+> Audit: run `python3 scripts/audit-debian-packages.py` from DuckBotOS root
 > Priority: 🔴 Critical | 🟡 Important | 🟢 Nice-to-have
 
 ---
@@ -10,11 +10,16 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| D1 **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ✅ DONE — **NVIDIA GPU on target machine** (Duckets 10:40). Keep cx-gpu-nvidia package. LM Studio GPU inference a bonus. | Affects driver bundling in ISO |
-| D2 **Boot type** — Live USB only / Full install / Both | ✅ DONE — **Both** (Live USB + full install) | Affects preseed/installer design |
-| D3 **License** — Apache 2.0 with CX Linux attribution, ok? | ✅ DONE — **Apache 2.0** confirmed | Blocks Phase 2 |
-| D4 **Both mode GDM picker** — Hermes / OpenClaw / Hybrid session picker | ✅ DONE — **Yes** | Affects Phase 4 |
-| D5 **Rule override scope** — LM Studio local models: HermesOS only or all projects? | ✅ DONE — **HermesOS only** (cloud-only stays for other projects) (default: HermesOS only) | Was asked at 23:53, no reply yet |
+| D1 | **GPU target** — NVIDIA / AMD / CPU-only for v1 ISO | ✅ DONE — **CPU-only** (Duckets 09:25). NVIDIA GPU on target machine. cx-gpu-nvidia package kept. | Affects driver bundling in ISO |
+| D2 | **Boot type** — Live USB only / Full install / Both | ✅ DONE — **Both** (Duckets 09:25) | Affects preseed/installer design |
+| D3 | **License** — Apache 2.0 with CX Linux attribution, ok? | ✅ DONE — **Apache 2.0** confirmed (Duckets 09:25) | Blocks Phase 2 |
+| D4 | **Both mode GDM picker** — Hermes / OpenClaw / Hybrid session picker | ✅ DONE — **Yes** (Duckets 09:25) | Affects Phase 4 |
+| D5 | **LM Studio rule scope** — LM Studio local models: HermesOS only or all projects? | ✅ DONE — **HermesOS/DuckBotOS only** (Duckets 09:25) | Cloud-only stays for other projects |
+| D6 | **cx-distro fork** — fork on GitHub + cloned to DuckBotOS/cx-distro | ✅ DONE — Forked, cloned, merged into main (2026-06-29) | Blocks all package builds |
+| D7 | **build-iso.yml branch trigger** — fires on `duckbotos`, repo on `main` | ✅ DONE — Fixed to fire on `main` + `duckbotos`, clones cx-distro fresh (commit `88ad96d`) | Blocks CI |
+| D8 | **audit-debian-packages.py path** — hardcoded to duckets' machine | ✅ DONE — Auto-detects `cx-distro` as sibling repo (commit `fa16928`) | Blocks local audit |
+| D9 | **verify-config-formats.py hardcoded paths** — all 4 paths env-vared | ✅ DONE — NDC_REPO_DIR, NDC_PATH, HERMES_CONFIG, OPENCLAW_CONFIG all env-vared (commit `fa16928`) | Blocks local verify |
+| D10 | **hermes-gateway.service User=duckets** — hardcoded username | ✅ DONE — Changed to `User=%h` (commit `722d018`) | Service won't start without this fix |
 
 ---
 
@@ -22,15 +27,20 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P2-1 Set up Linux build VM (Ubuntu 24.04) — UTM on Mac mini | ⏳ Pending | live-build needs Linux, can't do on Mac. UTM Ubuntu 24.04 VM, 4 cores, 8GB RAM, 64GB disk. | live-build needs Linux, can't do on Mac |
-| P2-2 Fork cxlinux-ai/cx-distro on GitHub | ⏳ Pending — CAN START NOW (gh CLI, no VM needed) | Fork to Franzferdinan51 account, clone locally. | Fork to Franzferdinan51 account |
-| P2-3 | Replace `cx-terminal` (Rust) in fork with Hermes install script | ⏳ Pending | Swap cxlinux-ai cx-terminal for Hermes |
-| P2-4 | Add LM Studio .deb package to ISO | ⏳ Pending | Headless install research needed |
-| P2-5 | ✅ BrowserOS installed as default browser | DONE | `duckbotos-browseros` package — sets as default, configures xdg-mime |
-| P2-6 | ✅ Newest Desktop Control (Lobster Edition) installed as system service | DONE | `duckbotos-computer-use` — MIT, 38 tests, 20+ tools, replaces computer-use-linux |
-| P2-7 | ✅ Install mode meta-packages written | DONE | `duckbotos-mode-{hermes,openclaw,hybrid}` (v0.2.2 rename — was duckbotos-meta-*) |
-| P2-8 | Configure Weston kiosk + Chromium kiosk service | ⏳ Pending | Fullscreen dashboard loading |
-| P2-9 | First bootable Hermes-only ISO | ⏳ Pending | Verify boots to Hermes dashboard |
+| P2-0 | Fork cxlinux-ai/cx-distro on GitHub | ✅ DONE — Forked as Franzferdinan51/cx-distro, cloned to DuckBotOS/cx-distro/ |
+| P2-1 | Merge cx-distro packages into DuckBotOS | ✅ DONE — 15 complete packages (8 new + 7 updated), 0 audit failures |
+| P2-2 | Fix audit script, verify-config paths, workflow, User=%h | ✅ DONE — Commits `fa16928`, `88ad96d`, `722d018` |
+| P2-3 | **Trigger ISO build** | 🔴 NEXT — Push to main/duckbotos → GitHub Actions runs `build-iso.yml` → surfaces any package errors | live-build needs Linux; CI on GitHub Actions handles this |
+| P2-4 | Set up Linux build VM (UTM on Mac mini) | ⏳ Pending | For local iterative builds without CI |
+| P2-5 | Fix any package errors surfaced by `dpkg-buildpackage` | ⏳ Pending | Dependent on P2-3 |
+| P2-6 | Fork cxlinux-ai/cx-distro on GitHub — already done | ✅ DONE | |
+| P2-7 | Replace `cx-terminal` (Rust) in fork with Hermes install script | ⏳ Pending | cx-terminal not in cx-distro source — it's an external dep |
+| P2-8 | Add LM Studio .deb package to ISO | ⏳ Pending | Headless install: `curl -fsSL https://lmstudio.ai/install.sh \| bash` in postinst |
+| P2-9 | ✅ BrowserOS installed as default browser | ✅ DONE | `duckbotos-browseros` — sets as default, configures xdg-mime |
+| P2-10 | ✅ Newest Desktop Control (Lobster Edition) installed as system service | ✅ DONE | `duckbotos-computer-use` — MIT, replaces computer-use-linux |
+| P2-11 | ✅ Install mode meta-packages written | ✅ DONE | `duckbotos-mode-{hermes,openclaw,hybrid}` |
+| P2-12 | Configure Weston kiosk + Chromium kiosk service | ⏳ Pending | Fullscreen dashboard loading |
+| P2-13 | First bootable Hermes-only ISO | ⏳ Pending | Verify boots to Hermes dashboard |
 
 ---
 
@@ -138,15 +148,51 @@
 | P8-2 | `docs/system-boot-flow.md` — Complete boot sequence | ✅ Done | 2026-06-29 04:35 — 8.7KB, service order, ports, failure handling |
 | P8-3 | `docs/phase10-readiness.md` — Docs→ISO bridge | ✅ Done | 2026-06-29 06:59 — 8.0KB, blockers + time estimates + parallel work |
 
-## 🟢 PHASE 10 — Polish & Release
+## 🟢 PHASE 11 — CI/CD & Sync
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| P10-1 | Plymouth boot theme (DuckBotOS branding) | ⏳ Pending | |
-| P10-2 | Wallpaper + icon assets | ⏳ Pending | |
-| P10-3 | GitHub Actions ISO build CI | ⏳ Pending | Reproducible `.iso` + `.sha256` + SBOM |
-| P10-4 | MkDocs documentation site | ⏳ Pending | |
-| P10-5 | v0.1.0 release — first bootable ISO | ⏳ Pending | |
+| P11-1 | DuckBotOS → cx-distro sync CI | ⏳ Pending | Auto-PR when DuckBotOS main changes cx-distro files |
+| P11-2 | cx-distro → DuckBotOS mirror sync | ⏳ Pending | Pull cx-distro duckbotos-branch changes back into DuckBotOS/cx-distro |
+| P11-3 | Package signing (GPG key setup) | ⏳ Pending | Sign .deb packages before release |
+| P11-4 | Release.yml — auto-tag + release on version bump | ⏳ Pending | |
+
+## 🟢 PHASE 12 — DuckBotOS ↔ cx-distro Relationship
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| P12-1 | Document DuckBotOS/cx-distro architecture | ✅ DONE — README.md architecture section + HANDOFF.md | |
+| P12-2 | Remove stale stub packages from DuckBotOS | ✅ DONE — 7 stubs replaced with 15 complete packages from cx-distro (2026-06-29) | |
+| P12-3 | CLAUDE.md in DuckBotOS root explaining two-repo structure | ⏳ Pending | For Claude/agent context when working in repo |
+| P12-4 | CLAUDE.md in cx-distro root | ⏳ Pending | |
+
+---
+
+## ✅ DONE
+
+| # | What | When |
+|---|------|------|
+| ✅ | Project named DuckBotOS | 2026-06-29 00:06 |
+| ✅ | GitHub repo: Franzferdinan51/DuckBotOS, main branch pushed | 2026-06-29 00:15 |
+| ✅ | SPEC.md (15KB, full architecture) | 2026-06-28 23:38 |
+| ✅ | README.md (GitHub-ready landing page) | 2026-06-29 00:15 |
+| ✅ | OPEN-ISSUES.md (decision tracker) | 2026-06-28 23:37 |
+| ✅ | docs/features.md (15 features, 3 tiers) | 2026-06-29 00:15 |
+| ✅ | LM Studio as first-class provider — CONFIRMED | 2026-06-28 23:49 |
+| ✅ | BrowserOS as default browser — CONFIRMED | 2026-06-28 23:49 |
+| ✅ | All Hermes + OpenClaw providers — CONFIRMED | 2026-06-28 23:49 |
+| ✅ | Base OS: Ubuntu 24.04 LTS — CONFIRMED | 2026-06-28 23:44 |
+| ✅ | Build approach: Fork cxlinux-ai/cx-distro — CONFIRMED | 2026-06-28 23:38 |
+| ✅ | 3 install modes: Hermes-only / OpenClaw-only / Both — CONFIRMED | 2026-06-28 23:38 |
+| ✅ | Cron job: every 35 min, M2.7 isolated agent cycle | 2026-06-28 23:58 |
+| ✅ | Brain updated with DuckBotOS decisions | Multiple updates |
+| ✅ | **cx-distro fork merged** (2026-06-29 18:00) | 2026-06-29 18:00 |
+| ✅ | **15 complete packages** (8 new + 7 updated) — 0 audit failures | 2026-06-29 18:00 |
+| ✅ | **build-iso.yml fixed** — fires on main+duckbotos, clones cx-distro fresh | 2026-06-29 18:00 |
+| ✅ | **audit-debian-packages.py path** — auto-detects cx-distro sibling | 2026-06-29 18:00 |
+| ✅ | **verify-config-formats.py paths** — all 4 env-vared | 2026-06-29 18:00 |
+| ✅ | **hermes-gateway.service User=%h** — portable systemd user | 2026-06-29 18:00 |
+| ✅ | **Stale GitHub URLs cleared** — desktop-control.md, HANDOFF-STATUS.md, README.md, cx-distro README.md | 2026-06-29 18:00 |
 
 ---
 
@@ -326,17 +372,19 @@ Remaining (needs Linux VM — automated via CI):
 
 ---
 
-*This file is the living todo for DuckBotOS. Updated after every significant work cycle.*
-
-
 ---
 
 *This file is the living todo for DuckBotOS. Updated after every significant work cycle.*
+
 ---
 
-## Cycle 2026-06-29 07:45 EDT
-- Confirmed all 18 docs complete (verified from prior cycles — cron prompt items 3-10 were all done in prior cycles)
-- Nothing left to document autonomously — all gaps filled
-- Sent Telegram message to Duckets with consolidated D1-D5 decisions form + UTM availability request
-- Single remaining blocker: Duckets answers D1-D5 + sets up Linux VM (UTM on Mac mini)
-- 3.5 hrs of parallelizable work remains after unblock (first-boot-wizard.md, troubleshooting.md, security-model.md, roadmap.md, debian/control sketch)
+## Cycle 2026-06-29 18:00 EDT
+- ✅ cx-distro fork cloned into DuckBotOS/cx-distro/
+- ✅ 15 complete packages merged (8 new + 7 updated), audit clean
+- ✅ build-iso.yml fixed: triggers on main+duckbotos, clones cx-distro fresh
+- ✅ audit-debian-packages.py path: auto-detects cx-distro sibling
+- ✅ verify-config-formats.py: all 4 hardcoded paths → env vars
+- ✅ hermes-gateway.service: User=duckets → User=%h
+- ✅ Stale GitHub URLs cleared (desktop-control.md, HANDOFF-STATUS.md, README.md, cx-distro README)
+- 🔴 NEXT: Trigger ISO build (push to main/duckbotos → GitHub Actions runs build-iso.yml)
+- ⏳ Remaining without VM: first-boot-wizard.md, troubleshooting.md, security-model.md, roadmap.md, CLAUDE.md files

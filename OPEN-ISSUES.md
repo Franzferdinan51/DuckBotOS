@@ -156,3 +156,26 @@ All 24 docs updated:
 - ✅ **READY for dpkg-buildpackage** (once UTM VM is created)
 
 Next unresolved: setting up the Linux build VM (UTM, Ubuntu 24.04) to actually run `./src/build.sh`.
+
+---
+
+### v0.2.4 — cx-distro Fork Merge (2026-06-29 18:00 EDT)
+
+cx-distro fork (Franzferdinan51/cx-distro, duckbotos branch) cloned into DuckBotOS/cx-distro/:
+
+| Fix | Detail | Commit |
+|-----|--------|--------|
+| cx-distro not cloned | Fork cloned to DuckBotOS/cx-distro/ | local |
+| 7 stale stub packages | Replaced with 15 complete packages | `38c543e` |
+| 8 missing packages | duckbotos-brain, branding, cua-bridge, hybrid, kiosk, kiosk-hermes, kiosk-openclaw, session-picker | `38c543e` |
+| audit-debian-packages.py path | Auto-detects cx-distro as sibling repo | `fa16928` |
+| verify-config-formats.py 4 paths | All hardcoded → env vars | `fa16928` |
+| build-iso.yml wrong branch | Trigger: main+duckbotos (was duckbotos only) | `88ad96d` |
+| build-iso.yml no cx-distro step | Clones fork fresh in a workflow step | `88ad96d` |
+| build-iso.yml wrong path refs | All DuckBotOS/ → duckbot-os-repo/ | `88ad96d` |
+| hermes-gateway.service User=duckets | → User=%h (portable) | `722d018` |
+| Stale GitHub URLs | desktop-control.md, HANDOFF-STATUS.md, README.md, cx-distro README.md | `fa16928`, `722d018` |
+
+Audit result: 15 source packages, 18 binary packages, 0 failures, 0 collisions, 0 violations ✅
+
+**Next step**: Push to main/duckbotos → GitHub Actions runs `build-iso.yml` → surfaces real `dpkg-buildpackage` errors.
