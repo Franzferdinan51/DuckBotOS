@@ -1,10 +1,27 @@
 """Final pre-build audit — checks everything dpkg-buildpackage needs.
-Run this from anywhere: python3 scripts/audit-debian-packages.py
+Run from DuckBotOS root: python3 scripts/audit-debian-packages.py
+Run from cx-distro root:  python3 ../DuckBotOS/scripts/audit-debian-packages.py
 Outputs PASS/FAIL per package + a summary table.
 """
 import os, re, sys
+from pathlib import Path
 
-ROOT = "/Users/duckets/Desktop/DuckBotOS/cx-distro/packages"
+# Resolve relative to this script's location so it works anywhere
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT  = SCRIPT_DIR.parent
+# cx-distro fork lives as a sibling to the DuckBotOS repo root
+CX_DISTRO  = REPO_ROOT / "cx-distro"
+
+# Audit target: prefer cx-distro (the build pipeline), fall back to DuckBotOS stubs
+if (CX_DISTRO / "packages").is_dir():
+    ROOT = str(CX_DISTRO / "packages")
+    SOURCE = "cx-distro"
+elif (REPO_ROOT / "packages").is_dir():
+    ROOT = str(REPO_ROOT / "packages")
+    SOURCE = "DuckBotOS"
+else:
+    ROOT = str(REPO_ROOT / "packages")  # fail with a useful error
+    SOURCE = "DuckBotOS"
 
 REQUIRED = ["debian/control", "debian/changelog", "debian/rules"]
 RECOMMENDED_IF_SERVICE = ["debian/postinst"]
@@ -110,10 +127,11 @@ def main():
         print(f"✅ All internal Depends point to existing duckbotos/cx packages")
     print()
 
-    # Summary
+    print()
     print("=" * 60)
     print("SUMMARY")
     print("=" * 60)
+    print(f"Source audited: {SOURCE} ({ROOT})")
     print(f"Source packages audited: {sum(1 for d in os.listdir(ROOT) if d.startswith('duckbotos-'))}")
     print(f"Unique binary packages: {len(all_pkgs)}")
     print(f"Missing required files (deb-control/rules/changelog): {len(failures)}")

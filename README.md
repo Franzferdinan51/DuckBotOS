@@ -45,8 +45,24 @@ Pick at install time:
 
 ## 📦 Pre-Build Audit — 15 packages, zero collisions
 
+DuckBotOS and cx-distro are **two separate repos**:
+
+| Repo | Role |
+|------|------|
+| **DuckBotOS** (this repo) | Docs, specs, source overlays — the human-facing layer |
+| **cx-distro** (`-b duckbotos` branch) | Debian build pipeline — all 15 complete packages live here |
+
+**Clone both:**
+```bash
+git clone https://github.com/Franzferdinan51/DuckBotOS
+cd DuckBotOS
+git clone https://github.com/Franzferdinan51/cx-distro -b duckbotos cx-distro
 ```
-$ python3 scripts/audit-debian-packages.py
+
+**Audit** (run from DuckBotOS root):
+```bash
+python3 scripts/audit-debian-packages.py
+Source audited: cx-distro (/full/path/to/DuckBotOS/cx-distro/packages)
 Source packages audited:    15
 Unique binary packages:     18
 Missing required files:      0
@@ -55,12 +71,12 @@ Depends violations:          0
 ✅ READY for dpkg-buildpackage
 ```
 
-Run this on the host machine anytime. Catches the bug classes that bit us in v0.2.0:
+The audit script auto-detects: if `cx-distro/` is present it audits that (the build source); otherwise it falls back to `DuckBotOS/packages/` (documentation stubs). Catches:
 - Binary package name collisions (two source packages generating the same `.deb` name)
 - `Depends:` entries pointing to non-existent DuckBotOS packages
 - Missing `control`/`rules`/`changelog` per source package
 
-The audit confirmed 15 source packages → 18 unique binary package names (`duckbotos-mode-hermes/openclaw/hybrid` are meta variants; `duckbotos-kiosk-hermes` and `duckbotos-kiosk-openclaw` are separate source packages).
+The audit confirmed 15 source packages → 18 unique binary package names across the cx-distro fork.
 
 See `docs/debian-packaging.md §14` for the audit script's full output format and the v0.2.2 collision-fix story.
 
@@ -118,18 +134,19 @@ Full list: [docs/features.md](docs/features.md)
 
 **DuckBotOS is ready to build.** All parallel-safe work is complete. The first ISO build is the next milestone — runs in CI automatically on the next push to `duckbotos` branch, or `./src/build.sh` in a Linux VM.
 
-| Area | Status |
+|| Area | Status |
 |------|--------|
-| 📚 Docs (22 total) | ✅ Complete |
-| 📦 Packages (13/13 with debian/control + debian/rules + debian/changelog) | ✅ Complete |
-| 🧠 **DuckBot brain** (duckbot-rag-memory, 67 MCP tools, FSRS, skill pipeline) | ✅ **Ships by default in all modes** — wired via OpenClaw plugin |
-| 🔧 All service files (hermes, openclaw, lm-studio, desktop-control, cua-driver, brain, kiosk, session-picker) | ✅ Written |
-| 🖱️ Newest Desktop Control (Lobster Edition) + trycua/cua bridge | ✅ **Newest Desktop Control rewrites computer-use package** — replaces agent-sh with Duckets' local tool. See [docs/desktop-control.md](docs/desktop-control.md) |
-| 🎨 Session picker UI for Both mode (8080) | ✅ Complete |
-| 🏗️ ISO build pipeline (cx-distro fork, Ubuntu 24.04 Noble) | ✅ Ready — `./src/build.sh` |
+| 📚 Docs (24 total) | ✅ Complete |
+| 📦 Packages — DuckBotOS (7 stubs) | ⚠️ Docs only — no rules/changelog |
+| 📦 Packages — cx-distro (15 complete) | ✅ All have control + rules + changelog |
+| 🧠 **DuckBot brain** | ✅ **Ships by default in all modes** |
+| 🔧 All service files | ✅ Written in cx-distro |
+| 🖱️ Newest Desktop Control | ✅ Lobster Edition wires into Hermes + OpenClaw |
+| 🎨 Session picker UI | ✅ cx-distro/duckbotos-session-picker |
+| 🏗️ ISO build pipeline (cx-distro fork) | ✅ Ready — `./src/build.sh` |
 | 🤖 GitHub Actions CI auto-builds ISO | ✅ Configured |
-| 📋 HANDOFF.md for other agents | ✅ Complete |
-| 💿 First bootable ISO | ⏳ Awaiting CI run / Linux VM |
+| 📋 HANDOFF.md | ✅ Complete |
+| 💿 First bootable ISO | ⏳ Awaiting Linux VM / CI run |
 
 The ISO build is the only remaining milestone. See [HANDOFF.md](HANDOFF.md) for the build guide and known issues.
 
@@ -157,7 +174,7 @@ We inherit from:
 - [thesysdev/openclaw-os](https://github.com/thesysdev/openclaw-os) — OpenClaw web workspace
 - [nousresearch/hermes-agent](https://github.com/nousresearch/hermes-agent) — agent core + Web Dashboard
 - [Franzferdinan51/duckbot-rag-memory](https://github.com/Franzferdinan51/duckbot-rag-memory) — **the brain (ships by default in all DuckBotOS modes)**
-- [Franzferdinan51/desktop-control-lobster-edition-skill](https://github.com/Franzferdinan51/desktop-control-lobster-edition-skill) — **the desktop control MCP (Duckets' local tool, MIT, 38 tests)**
+- [Franzferdinan51/clawdwatch-lobster-edition](https://github.com/Franzferdinan51/clawdwatch-lobster-edition) — **Newest Desktop Control + DEFCON 3 threat monitor (MIT)**
 - [trycua/cua](https://github.com/trycua/cua) — VM orchestration + optional Linux computer-use backend
 - [browseros-ai/BrowserOS](https://github.com/browseros-ai/BrowserOS) — default browser
 

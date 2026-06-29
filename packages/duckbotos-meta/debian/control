@@ -28,7 +28,7 @@ Description: DuckBotOS — Agent-first Linux with Hermes + OpenClaw
   - OpenClaw as a verified/secondary agent
   - LM Studio as a first-class local model provider
   - BrowserOS as the default agentic web browser
-  - computer-use-linux for desktop automation
+  - Newest Desktop Control (Lobster Edition) for desktop automation
   - Weston kiosk for agent dashboard display
  .
  Supports NVIDIA, AMD, and CPU-only hardware targets.
@@ -140,7 +140,7 @@ Architecture: all
 Depends: ${misc:Depends},
  duckbotos-base,
  computer-use-linux
-Description: DuckBotOS computer-use — desktop automation MCP server
+Description: DuckBotOS computer-use — Newest Desktop Control (Lobster Edition)
  Installs computer-use-linux as a systemd-per-user MCP server for
  automated desktop interaction and accessibility-driven control.
  .

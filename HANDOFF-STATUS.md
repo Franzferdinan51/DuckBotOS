@@ -6,7 +6,7 @@
 
 - **Project**: Franzferdinan51/DuckBotOS (main branch)
 - **Build pipeline**: Franzferdinan51/cx-distro (branch: duckbotos)
-- **Desktop control**: Franzferdinan51/desktop-control-lobster-edition-skill (MIT, 38 tests, 20+ tools) — replaces Franzferdinan51/desktop-control-lobster-edition-skill
+- **Desktop control**: [Franzferdinan51/clawdwatch-lobster-edition](https://github.com/Franzferdinan51/clawdwatch-lobster-edition) (MIT, DEFCON 3 threat monitor) — Newest Desktop Control wires into Hermes + OpenClaw for desktop automation
 - **VM orchestration**: trycua/cua (MIT) — optional `duckbotos-cua-bridge` package
 - **Brain (default in ALL modes)**: Franzferdinan51/duckbot-rag-memory
 - **Branches synced**: ✅ both repos up to date

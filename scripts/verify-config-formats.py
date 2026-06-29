@@ -11,8 +11,14 @@ import json
 import subprocess
 import os
 
-NDC_REPO_DIR = "/Users/duckets/desktop-control-lobster-edition-skill"
-NDC_PATH = "/opt/duckbotos/desktop-control/src/server.js"
+NDC_REPO_DIR = os.environ.get(
+    "NDC_REPO_DIR",
+    str(Path.home() / "Desktop" / "desktop-control-lobster-edition-skill")
+)
+NDC_PATH = os.environ.get(
+    "NDC_PATH",
+    "/opt/duckbotos/desktop-control/src/server.js"
+)
 CANONICAL = json.dumps({
     "mcpServers": {
         "newest-desktop-control": {
@@ -68,7 +74,10 @@ print()
 
 # Step 2: validate Hermes format via the REAL /Users/duckets/hermes-config.json
 print("=== Step 2: Hermes (mcp_servers.{name} = JSON-STRINGIFIED value) ===")
-hermes_path = "/Users/duckets/hermes-config.json"
+hermes_path = os.environ.get(
+    "HERMES_CONFIG",
+    str(Path.home() / "hermes-config.json")
+)
 with open(hermes_path) as f:
     hermes_cfg = json.load(f)
 ms = hermes_cfg.get("mcp_servers", {})
@@ -87,7 +96,10 @@ print()
 
 # Step 3: validate OpenClaw format via REAL /Users/duckets/.openclaw/openclaw.json (or /var/lib fallback)
 print("=== Step 3: OpenClaw (mcp.servers.{name} = NESTED OBJECT under 'mcp') ===")
-oc_path = "/Users/duckets/.openclaw/openclaw.json"
+oc_path = os.environ.get(
+    "OPENCLAW_CONFIG",
+    str(Path.home() / ".openclaw" / "openclaw.json")
+)
 if not os.path.exists(oc_path):
     print(f"  (file missing at {oc_path} — simulate expected shape instead)")
     oc_cfg = {"mcp": {"servers": {}}}
