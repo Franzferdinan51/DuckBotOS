@@ -29,8 +29,8 @@ env:
 jobs:
   build-iso:
     name: Build DuckBotOS (${{ env.DUCKBOTOS_MODE }}) ISO
-    runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
 
     steps:
       - name: Checkout DuckBotOS (this repo)
