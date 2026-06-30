@@ -79,21 +79,17 @@ jobs:
         env:
           DUCKBOTOS_MODE: ${{ env.DUCKBOTOS_MODE }}
         run: |
-          cd duckbot-os-repo/cx-distro
-          chmod +x src/build.sh
-          chmod +x src/mods/install_all_mods.sh
-          chmod +x scripts/*.sh
-          chmod +x scripts/install-deps.sh
-          sed -i 's/^export DUCKBOTOS_MODE=.*/export DUCKBOTOS_MODE="${{ env.DUCKBOTOS_MODE }}"/' src/args.sh
-          sudo ./src/build.sh
+          cd duckbot-os-repo
+          chmod +x scripts/ci-build.sh
+          sudo bash scripts/ci-build.sh
 
       - name: Locate built ISO
         id: locate
         run: |
-          ISO_PATH=$(find . -name "*.iso" -type f 2>/dev/null | head -1)
+          ISO_PATH=$(find duckbot-os-repo -name "*.iso" -type f 2>/dev/null | head -1)
           if [ -z "$ISO_PATH" ]; then
             echo "Error: No ISO found after build"
-            find . -name "*.iso" 2>/dev/null || echo "no iso files found"
+            find duckbot-os-repo -name "*.iso" 2>/dev/null || echo "no iso files found"
             exit 1
           fi
           echo "ISO_PATH=$ISO_PATH" >> $GITHUB_OUTPUT
